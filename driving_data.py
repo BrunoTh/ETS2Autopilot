@@ -49,7 +49,7 @@ val_batch_pointer = 0
 
 sequences = []
 # read sequence.txt
-with open("../captured/sequence.txt") as f:
+with open("captured/sequence.txt") as f:
     for line in f:
         split = line.split()
         sequences.append([int(split[0]), int(split[1]), split[2], int(split[3])])
@@ -66,7 +66,7 @@ def get_country(img_id):
             return sequences[i][2]
 
 # read data.txt
-with open("../captured/data.txt") as f:
+with open("captured/data.txt") as f:
     for line in f:
         split = line.split()
         # Skip if indicator was active
@@ -84,7 +84,7 @@ with open("../captured/data.txt") as f:
         #        xs.append("../captured/" + line.split()[0])
         #        ys.append(steering_deg)
 
-        xs.append(os.path.join("../captured/", line.split()[0]))
+        xs.append(os.path.join("captured/", line.split()[0]))
         # the paper by Nvidia uses the inverse of the turning radius,
         # but steering wheel angle is proportional to the inverse of turning radius
         # so the steering wheel angle in radians is used as the output

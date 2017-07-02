@@ -28,8 +28,8 @@ SOFTWARE.
 
 import os
 import tensorflow as tf
-import steering_ai.driving_data as driving_data
-import steering_ai.model as model
+import driving_data
+import model
 from settings import COUNTRY
 
 

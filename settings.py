@@ -1,15 +1,17 @@
-JOYSTICK = 1
-VJOY_DEVICE = 1
+JOYSTICK = 1  # ID of your joystick device (get the ID with gamepad_analyzer.py)
+VJOY_DEVICE = 1  # ID of virtual joystick
 
 AUTOPILOT_SOUND_ACTIVATE = None
-ADAPTIVE_STEERING = True
+ADAPTIVE_STEERING = False
 
 AUTOPILOT_BUTTON = 6  # Button to enable/disable autpilot/recording
 STEERING_AXIS = 0
 THROTTLE_AXIS = 3
+INDICATOR_LEFT_BUTTON = 4  # Button for left indicator
+INDICATOR_RIGHT_BUTTON = 5  # Button for right indicator
 
-COUNTRY = ["DE", "PL", "DK", "SE", "BE"]
-COUNTRY_CODE = "DE"
+COUNTRY = ["DE", "PL", "DK", "SE", "BE"]  # Countries with similar road markings for the same model
+COUNTRY_CODE = "DE"  # Country of actual recording sequence
 
 # Game window
 GAME_WINDOW_X = [0, 1920]

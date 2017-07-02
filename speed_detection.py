@@ -5,10 +5,7 @@ import settings
 
 
 ### TRAINING ###
-if os.path.exists("generalsamples.data"):
-    path = ""
-else:
-    path = "../"
+path = ""
 samples = np.loadtxt('%sgeneralsamples.data' % path, np.float32)
 responses = np.loadtxt('%sgeneralresponses.data' % path, np.float32)
 responses = responses.reshape((responses.size, 1))

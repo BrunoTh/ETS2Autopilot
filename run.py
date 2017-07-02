@@ -28,7 +28,7 @@ SOFTWARE.
 
 import tensorflow as tf
 import scipy.misc
-import steering_ai.model as model
+import model
 import cv2
 from PIL import ImageGrab
 import pygame

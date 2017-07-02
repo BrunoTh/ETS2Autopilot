@@ -41,19 +41,19 @@ last_record = 0
 
 pygame.init()
 pygame.joystick.init()
-joystick = pygame.joystick.Joystick(1)
+joystick = pygame.joystick.Joystick(settings.JOYSTICK)
 joystick.init()
 
 data_file = open("captured/data.txt", "a")
 sequence_file = open("captured/sequence.txt", "a")
 sequence_start = img_id
 sequence_end = img_id
-sequence_country = "DE"
+sequence_country = settings.COUNTRY_CODE
 sequence_type = -1  # 0 - Autobahn, 1 - Land, 2 - City
 
 while True:
     pygame.event.pump()
-    recording_button_act = joystick.get_button(6)
+    recording_button_act = joystick.get_button(settings.AUTOPILOT_BUTTON)
     if recording_button_act != recording_button_prev and recording_button_act == 1:
         recording = not recording
 
@@ -64,7 +64,7 @@ while True:
             sequence_file.write("%d %d %s %d\n" % (sequence_start, sequence_end, sequence_country, sequence_type))
     recording_button_prev = recording_button_act
 
-    indicator_left_act = joystick.get_button(4)
+    indicator_left_act = joystick.get_button(settings.INDICATOR_LEFT_BUTTON)
     if indicator_left_act != indicator_left_prev and indicator_left_act == 1:
         indicator_left = not indicator_left
 
@@ -73,7 +73,7 @@ while True:
             indicator_right = False
     indicator_left_prev = indicator_left_act
 
-    indicator_right_act = joystick.get_button(5)
+    indicator_right_act = joystick.get_button(settings.INDICATOR_RIGHT_BUTTON)
     if indicator_right_act != indicator_right_prev and indicator_right_act == 1:
         indicator_right = not indicator_right
 

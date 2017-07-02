@@ -1,0 +1,12 @@
+backports.weakref==1.0rc1
+bleach==1.5.0
+html5lib==0.9999999
+Markdown==2.2.0
+olefile==0.44
+opencv-python==3.2.0.7
+Pillow==4.1.1
+protobuf==3.3.0
+pygame==1.9.3
+six==1.10.0
+tensorflow-gpu==1.2.0
+Werkzeug==0.12.2

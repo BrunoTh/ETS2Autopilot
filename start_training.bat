@@ -1,0 +1,1 @@
+python\python.exe train.py

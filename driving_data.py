@@ -61,7 +61,7 @@ def get_country(img_id):
     I assume that every image in the sequence was recorded under the same conditions (like weather, road type or country).
     This function returns the country of the given image (id).
     """
-    for i in range(len(sequences)-1):
+    for i in range(len(sequences)):
         if img_id in range(sequences[i][0], sequences[i][1]):
             return sequences[i][2]
 

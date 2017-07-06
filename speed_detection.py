@@ -19,6 +19,8 @@ def get_speed(frame):
     :param frame: Captured image
     :return: Speed
     """
+    # Disable speed detection
+    return 0
     speed = frame[settings.IMAGE_SPEED_Y[0]:settings.IMAGE_SPEED_Y[1], settings.IMAGE_SPEED_X[0]:settings.IMAGE_SPEED_X[1]]
     speed_gray = cv2.cvtColor(speed, cv2.COLOR_BGR2GRAY)
 

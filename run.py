@@ -121,7 +121,7 @@ while cv2.waitKey(1) != ord('q'):
         print(steering)
         vjoy.set_axis(pyvjoy.HID_USAGE_Y, steering)
 
-    call("clear")
+    #call("clear")
     print("Predicted steering angle: " + str(degrees) + " degrees")
     # Show, what the neural network "sees"
     cv2.imshow('frame', main)

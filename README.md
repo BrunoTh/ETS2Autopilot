@@ -10,7 +10,7 @@ This autpilot is based on the project by Sully Chen: https://github.com/SullyChe
 ### 1. Installation (commands in windows cmd and project directory)
 - `python\python.exe get-pip.py`
 - `python\python.exe -m pip install numpy-*.whl`
-- `pyhton\python.exe -m pip instal scipy-*.whl`
+- `python\python.exe -m pip install scipy-*.whl`
 - CPU-only: `python\python.exe -m pip install opencv-python pillow pygame tensorflow`
 - GPU: `python\python.exe -m pip install opencv-python pillow pygame tensorflow-gpu`
 - copy vJoyInterface.dll from vJoy installation directory to folder pyvjoy

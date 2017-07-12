@@ -45,7 +45,11 @@ class Database(object):
         try:
             c = self.conn.cursor()
             c.execute(command, params)
-            return c.fetchall()
+
+            if command.startswith("INSERT"):
+                return c.lastrowid
+            else:
+                return c.fetchall()
         except Exception as e:
             print(e)
             return "ERROR"
@@ -56,7 +60,32 @@ class Settings(object):
         self.db = Database()
 
     def get_value(self, key):
-        pass
+        """
+        :param key:
+        :return: Returns settings value or None if the key does not exist
+        """
+        result = self.db.execute("SELECT value FROM settings WHERE key=?", (key,))
+        if len(result) > 0 and result != "ERROR":
+            return result[0][0]
+        else:
+            return None
 
     def set_value(self, key, value):
-        pass
+        self.db.execute("UPDATE settings SET value=? WHERE key=?", (value, key,))
+
+    def delete_entry(self, key):
+        self.db.execute("DELETE FROM settings WHERE key=?", (key,))
+
+
+class sequence(object):
+    def __init__(self):
+        self.db = Database()
+
+    def add_sequence(self, type):
+        """
+        Creates a new sequence in db
+        :return: ID of new sequence
+        """
+        settings = Settings()
+        country = settings.get_value("country")
+        id = self.db.execute("INSERT INTO sequence (country, type) VALUES((SELECT id FROM country WHERE code=?))", (country))

@@ -31,7 +31,7 @@ def get_speed(frame):
     _, speed_threshold = cv2.threshold(speed_zoom, 210, 255, cv2.THRESH_BINARY)
 
     to_detect = speed_threshold[:, 26:]
-    cv2.imshow('speed', to_detect)
+    #cv2.imshow('speed', to_detect)
     to_detect = cv2.resize(to_detect, (20, 20))
     to_detect = to_detect.reshape((1, 400))
     to_detect = np.float32(to_detect)

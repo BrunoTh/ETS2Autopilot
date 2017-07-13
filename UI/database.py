@@ -1,5 +1,35 @@
 import sqlite3
 
+"""
+Image:
+INSERT INTO image VALUES (?,...);
+DELETE FROM image WHERE filename=?;
+UPDATE image SET maneuver=? WHERE filename=?;
+
+Sequence:
+INSERT INTO sequence (country) VALUES (?);
+DELETE FROM sequence WHERE id=?;
+UPDATE sequence SET country=?/type=? WHERE id=?;
+
+Country:
+INSERT INTO country VALUES (?);
+SELECT id FROM country WHERE code=?;
+
+
+get_country_id(code) - Creates or selects country and returns cid
+get_country_list() - Returns list with all country codes and ids
+
+add_image(filename, ...)
+set_image_maneuver(filename or filename-range)
+delete_image(filename)
+get_image_list(sequence) - Returns list with all images in a sequence
+
+add_sequence(country, type=-1)
+update_sequence(country, type)
+delete_sequence(id)
+get_sequence_list() - Returns list with all sequences
+"""
+
 
 class Database(object):
     def __init__(self):
@@ -17,7 +47,7 @@ class Database(object):
                                 CREATE TABLE IF NOT EXISTS sequence (
                                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                                     country INT,
-                                    type INT,
+                                    type INT DEFAULT -1,
                                     FOREIGN KEY(country) REFERENCES country(id)
                                 );
                                 
@@ -29,7 +59,7 @@ class Database(object):
                                     throttle DOUBLE,
                                     maneuver INTEGER NOT NULL,
                                     sequence INTEGER NOT NULL,
-                                    FOREIGN KEY(sequence) REFERENCES sequence(id)
+                                    FOREIGN KEY(sequence) REFERENCES sequence(id) ON DELETE CASCADE 
                                 );
                             """
 
@@ -77,9 +107,16 @@ class Settings(object):
         self.db.execute("DELETE FROM settings WHERE key=?", (key,))
 
 
-class sequence(object):
+class Sequence(object):
     def __init__(self):
         self.db = Database()
+
+    def get_country_id(self, code):
+        cid = self.db.execute("SELECT id FROM country WHERE code=?", (code,))
+        if len(cid) > 0:
+            return cid[0][0]
+        else:
+            return self.db.execute("INSERT INTO country (code) VALUES (?)", (code,))
 
     def add_sequence(self, type):
         """
@@ -88,4 +125,17 @@ class sequence(object):
         """
         settings = Settings()
         country = settings.get_value("country")
-        id = self.db.execute("INSERT INTO sequence (country, type) VALUES((SELECT id FROM country WHERE code=?))", (country))
+        cid = self.get_country_id(country)
+        id = self.db.execute("INSERT INTO sequence (country) VALUES (?)", (cid,))
+        return id
+
+
+class Image(object):
+    def __init__(self):
+        self.db = Database()
+
+    def add_image(self, filename, steering, speed, throttle, maneuver, sequence):
+        self.db.execute("INSERT INTO image VALUES (?,?,?,?,?,?)", (filename, steering, speed, throttle, maneuver, sequence,))
+
+    def delete_image(self, filename):
+        self.db.execute("DELETE FROM image WHERE filename=?", (filename,))

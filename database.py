@@ -19,6 +19,7 @@ class Database(object):
                                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                                     country INT,
                                     type INT DEFAULT -1,
+                                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
                                     FOREIGN KEY(country) REFERENCES country(id)
                                 );""")
                                 
@@ -60,6 +61,16 @@ class Database(object):
 
 
 class Settings(object):
+    AUTOPILOT = "button_autopilot"
+    LEFT_INDICATOR = "button_left_indicator"
+    RIGHT_INDICATOR = "button_right_indicator"
+    STEERING_AXIS = "axis_steering"
+    THROTTLE_AXIS = "axis_throttle"
+    IMAGE_FRONT_BORDER_LEFT = "image_front.border_left"
+    IMAGE_FRONT_BORDER_RIGHT = "image_front.border_right"
+    IMAGE_FRONT_BORDER_TOP = "image_front.border_top"
+    IMAGE_FRONT_BORDER_BOTTOM = "image_front.border_bottom"
+
     def __init__(self):
         self.db = Database()
 
@@ -97,6 +108,17 @@ class Data(object):
             return cid[0][0]
         else:
             return self.db.execute("INSERT INTO country (code) VALUES (?)", (code,))
+
+    def get_country_code(self, cid):
+        """
+        :param cid: country id
+        :return: country code
+        """
+        code = self.db.execute("SELECT code FROM country WHERE id=?", (cid,))
+        if len(code) > 0:
+            return code[0][0]
+        else:
+            return None
 
     def get_country_list(self):
         """
@@ -159,10 +181,21 @@ class Data(object):
 
     def get_sequence_list(self):
         """
-        :return: List with all sequences
+        :return: List with all sequences (id,timestamp,country,type)
         """
-        result = self.db.execute("SELECT id, country, type FROM sequence")
+        result = self.db.execute("SELECT id, timestamp, country, type FROM sequence")
         if type(result) == str and result.startswith("ERROR"):
             return []
         else:
             return result
+
+    def get_sequence_data(self, sid):
+        """
+        :param sid:
+        :return:
+        """
+        sequence_data = self.db.execute("SELECT id, country, type FROM sequence WHERE id=?", (sid,))
+        if len(sequence_data) > 0:
+            return sequence_data[0]
+        else:
+            return None

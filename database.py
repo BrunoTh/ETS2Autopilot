@@ -61,11 +61,22 @@ class Database(object):
 
 
 class Settings(object):
+    CONTROLLER = "controller_id"
+    VJOY_DEVICE = "vjoy_id"
+
+    AUTOPILOT_SOUND_ACTIVATE = "autopilot_sound.activate"
+    AUTOPILOT_SOUND_DEACTIVATE = "autopilot_sound.deactivate"
+    ADAPTIVE_STEERING = "adaptive_steering"
+
+    COUNTRY_DEFAULT = "country_default"
+    COUNTRIES_MODEL = "countries_model"
+
     AUTOPILOT = "button_autopilot"
     LEFT_INDICATOR = "button_left_indicator"
     RIGHT_INDICATOR = "button_right_indicator"
     STEERING_AXIS = "axis_steering"
     THROTTLE_AXIS = "axis_throttle"
+
     IMAGE_FRONT_BORDER_LEFT = "image_front.border_left"
     IMAGE_FRONT_BORDER_RIGHT = "image_front.border_right"
     IMAGE_FRONT_BORDER_TOP = "image_front.border_top"
@@ -86,7 +97,10 @@ class Settings(object):
             return None
 
     def set_value(self, key, value):
-        self.db.execute("UPDATE settings SET value=? WHERE key=?", (value, key,))
+        if not self.get_value(key):
+            self.db.execute("INSERT INTO settings (key, value) VALUES (?,?)", (key, value,))
+        else:
+            self.db.execute("UPDATE settings SET value=? WHERE key=?", (value, key,))
 
     def delete_entry(self, key):
         self.db.execute("DELETE FROM settings WHERE key=?", (key,))
@@ -131,7 +145,8 @@ class Data(object):
             return result
 
     def add_image(self, filename, steering, speed, throttle, maneuver, sequence):
-        self.db.execute("INSERT INTO image VALUES (?,?,?,?,?,?)", (filename, steering, speed, throttle, maneuver, sequence,))
+        self.db.execute("INSERT INTO image (filename, steering, speed, throttle, maneuver, sequence) "
+                        "VALUES (?,?,?,?,?,?)", (filename, steering, speed, throttle, maneuver, sequence,))
 
     def set_image_maneuver(self, filename, maneuver):
         self.db.execute("UPDATE image SET maneuver=? WHERE filename=?", (maneuver, filename,))
@@ -144,7 +159,15 @@ class Data(object):
         :param sequence: id of sequence
         :return: List with all images of a sequence
         """
-        result = self.db.execute("SELECT filename, steering, speed, throttle, maneuver FROM image WHERE sequence=?", (sequence,))
+        result = self.db.execute("SELECT id, filename, steering, speed, throttle, maneuver FROM image WHERE sequence=?", (sequence,))
+        if type(result) == str and result.startswith("ERROR"):
+            return []
+        else:
+            return result
+
+    def get_image_data(self, imgid):
+        result = self.db.execute("SELECT id, filename, steering, speed, throttle, maneuver FROM image WHERE id=?",
+                                 (imgid,))
         if type(result) == str and result.startswith("ERROR"):
             return []
         else:

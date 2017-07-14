@@ -1,6 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea
 *.sqlite
+captured/
 
 ### Python template
 # Byte-compiled / optimized / DLL files

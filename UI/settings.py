@@ -1,4 +1,8 @@
 from PyQt5.QtWidgets import QMainWindow
+from PyQt5 import QtGui
+from PIL import ImageGrab
+import numpy as np
+import cv2
 from UI.ui_settings import Ui_MainWindow
 from database import Settings
 
@@ -59,7 +63,11 @@ class SettingsUI(object):
         pass
 
     def fill_screen_cap(self):
-        pass
+        frame_raw = ImageGrab.grab(bbox=(0, 0, 1920, 1080))
+        frame = cv2.cvtColor(np.array(frame_raw), cv2.COLOR_RGB2BGR)
+        qimg = QtGui.QImage(frame, frame.shape[1], frame.shape[0], frame.shape[1]*3, QtGui.Qimage.Format_RGB888)
+        pixmap = QtGui.QPixmap(qimg)
+        self.ui.screen_cap.setPixmap(pixmap)
 
     def fill_screen_list(self):
         pass

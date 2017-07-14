@@ -27,13 +27,15 @@ Function list:
 
 
 class MainUI(object):
-    def __init__(self):
+    def __init__(self, app):
+        self.app = app
+
         self.window = QMainWindow()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.window)
 
         self.settings_ui = SettingsUI()
-        self.sequence_ui = SequenceUI()
+        self.sequence_ui = SequenceUI(self.app)
 
         # Register buttons and stuff
         self.ui.actionSettings.triggered.connect(self.settings_ui.show)

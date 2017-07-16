@@ -77,6 +77,7 @@ class Settings(object):
     STEERING_AXIS = "axis_steering"
     THROTTLE_AXIS = "axis_throttle"
 
+    SCREEN = "screen"
     IMAGE_FRONT_BORDER_LEFT = "image_front.border_left"
     IMAGE_FRONT_BORDER_RIGHT = "image_front.border_right"
     IMAGE_FRONT_BORDER_TOP = "image_front.border_top"
@@ -171,7 +172,10 @@ class Data(object):
         if type(result) == str and result.startswith("ERROR"):
             return []
         else:
-            return result
+            if len(result) > 0:
+                return result[0]
+            else:
+                return []
 
     def add_sequence(self, country=None, road_type=-1):
         """

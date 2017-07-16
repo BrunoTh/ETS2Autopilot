@@ -226,7 +226,7 @@
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>10</x>
       <y>32</y>
       <width>66</width>
       <height>20</height>
@@ -252,7 +252,7 @@
    <widget class="QLineEdit" name="e_autopilot">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>320</x>
       <y>80</y>
       <width>51</width>
       <height>32</height>
@@ -262,7 +262,7 @@
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>190</x>
       <y>84</y>
       <width>121</width>
       <height>20</height>
@@ -331,7 +331,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>84</y>
+      <y>124</y>
       <width>121</width>
       <height>20</height>
      </rect>
@@ -347,7 +347,7 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>80</y>
+      <y>120</y>
       <width>51</width>
       <height>32</height>
      </rect>
@@ -357,7 +357,7 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>120</y>
+      <y>160</y>
       <width>51</width>
       <height>32</height>
      </rect>
@@ -367,7 +367,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>124</y>
+      <y>164</y>
       <width>121</width>
       <height>20</height>
      </rect>
@@ -380,6 +380,9 @@
     </property>
    </widget>
    <widget class="QLabel" name="label_13">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>409</x>
@@ -393,6 +396,9 @@
     </property>
    </widget>
    <widget class="QRadioButton" name="rb_gamepad">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>450</x>
@@ -404,11 +410,17 @@
     <property name="text">
      <string>Gamepad</string>
     </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
     <property name="checked">
      <bool>true</bool>
     </property>
    </widget>
    <widget class="QRadioButton" name="rb_wheel">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>450</x>
@@ -419,6 +431,32 @@
     </property>
     <property name="text">
      <string>Steering wheel</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_14">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>84</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>vJoy Device:</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="e_vjoy">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>80</y>
+      <width>51</width>
+      <height>32</height>
+     </rect>
     </property>
    </widget>
   </widget>

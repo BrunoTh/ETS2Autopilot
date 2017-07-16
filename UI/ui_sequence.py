@@ -51,4 +51,3 @@ class Ui_MainWindow(object):
         self.b_noIndicator.setText(_translate("MainWindow", "No Indicator"))
         self.b_leftIndicator.setText(_translate("MainWindow", "Left Indicator"))
         self.b_rightIndicator.setText(_translate("MainWindow", "Right Indicator"))
-

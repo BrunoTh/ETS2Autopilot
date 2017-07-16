@@ -36,6 +36,6 @@ if not dbs.get_value("migrated"):
 
 # START APPLICATION
 app = QApplication(sys.argv)
-main = MainUI(app)
+main = MainUI()
 main.show()
 sys.exit(app.exec_())

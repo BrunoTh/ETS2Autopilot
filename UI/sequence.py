@@ -3,14 +3,11 @@ from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5 import QtCore, QtGui
 from UI.ui_sequence import Ui_MainWindow
 from database import Data
-import sys
 import os
 
 
 class SequenceUI(object):
-    def __init__(self, app):
-        self.app = app
-
+    def __init__(self):
         self.window = QMainWindow()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.window)
@@ -57,5 +54,5 @@ class SequenceUI(object):
     def show_image(self):
         img_id = self._get_selected_image()
         img_data = Data().get_image_data(img_id)
-        pixmap = QtGui.QPixmap(os.path.join(os.getcwd(), "captured", img_data[1]))
+        pixmap = QtGui.QPixmap(os.path.join("captured", img_data[1]))
         self.ui.captured_image.setPixmap(pixmap)

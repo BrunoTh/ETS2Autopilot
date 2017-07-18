@@ -107,7 +107,7 @@ while True:
     # cv2.imshow('cap', dilated)
     cv2.imshow('resized', resized)
 
-    axis = joystick.get_axis(0)*180  # -180 to 180 "degrees"
+    axis = joystick.get_axis(settings.STEERING_AXIS)*180  # -180 to 180 "degrees"
     throttle = joystick.get_axis(settings.THROTTLE_AXIS) * 100  # -100=full throttle, 100=full brake
 
     speed = speed_detection.get_speed(frame)

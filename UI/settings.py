@@ -6,7 +6,7 @@ import cv2
 import pygame
 from UI.ui_settings import Ui_MainWindow
 from database import Settings
-
+import functions
 import sys
 
 
@@ -133,13 +133,6 @@ class SettingsUI(object):
         self.ui.slider_top.setMaximum(screen_res.height())
         self.ui.slider_bottom.setMaximum(screen_res.height())
 
-    def get_screen_bbox(self):
-        screen_id = Settings().get_value(Settings.SCREEN)
-        if screen_id is None:
-            screen_id = 0
-        screen_res = QApplication.desktop().screenGeometry(int(screen_id))
-        return screen_res.left(), screen_res.top(), screen_res.right(), screen_res.bottom()
-
     def save_settings(self):
         settings = Settings()
         settings.set_value(settings.IMAGE_FRONT_BORDER_LEFT, self.ui.slider_left.value())
@@ -166,7 +159,7 @@ class SettingsUI(object):
         slider_top = self.ui.slider_top.value()
         slider_bottom = self.ui.slider_bottom.value()
 
-        frame_raw = ImageGrab.grab(bbox=self.get_screen_bbox())
+        frame_raw = ImageGrab.grab(bbox=functions.get_screen_bbox())
         frame = np.uint8(frame_raw)
         frame = cv2.rectangle(frame, (slider_left, slider_top), (slider_right, slider_bottom), (255, 0, 0), 4)
         qimg = QtGui.QImage(frame, frame.shape[1], frame.shape[0], frame.strides[0], QtGui.QImage.Format_RGB888)

@@ -5,25 +5,11 @@ from UI.ui_main import Ui_MainWindow
 from UI.settings import SettingsUI
 from UI.sequence import SequenceUI
 from database import Settings, Data
+from thread_controller import ControllerThread
+from thread_autopilot import AutopilotThread
+from thread_recording import RecordingThread
+from thread_training import TrainingThread
 import sys
-
-"""
-Function list:
-- get_sequence_list() : list
-- append_sequence_changes(id, country, road_type)
-- delete_sequence(id)
-- show_sequence_details(id)
-
-- show_front_image()
-- show_steering_wheel()
-
-- enter_mode()
-- leave_mode()
-
-- show_settings()
-- exit()
-- show_info()
-"""
 
 
 class MainUI(object):
@@ -32,8 +18,15 @@ class MainUI(object):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.window)
 
+        # Register other windows
         self.settings_ui = SettingsUI()
         self.sequence_ui = SequenceUI()
+
+        # Define thread variables
+        self.thread_controller = None
+        self.thread_training = None
+        self.thread_autopilot = None
+        self.thread_recording = None
 
         # Register buttons and stuff
         self.ui.actionSettings.triggered.connect(self.settings_ui.show)
@@ -48,6 +41,11 @@ class MainUI(object):
         self.ui.b_mode.clicked.connect(self.enter_mode)
 
         self.fill_sequence_list()
+
+        # Try to start controller thread
+        if Settings().get_value(Settings.CONTROLLER) is not None and Settings().get_value(Settings.VJOY_DEVICE) is not None:
+            self.thread_controller = ControllerThread()
+            self.thread_controller.start()
 
     def show(self):
         self.window.show()
@@ -144,11 +142,57 @@ class MainUI(object):
         b_mode:
         Starts the autopilot, recording or training.
         """
-        pass
+        rb_autopilot = self.ui.mode_autopilot.isChecked()
+        rb_recording = self.ui.mode_recording.isChecked()
+        rb_training = self.ui.mode_training.isChecked()
+
+        # Start the controller thread if it is not running
+        if self.thread_controller is None:
+            self.thread_controller = ControllerThread()
+            self.thread_controller.start()
+        else:
+            if not self.thread_controller.is_running():
+                self.thread_controller.start()
+
+        # Start mode specific thread
+        if rb_autopilot:
+            self.thread_autopilot = AutopilotThread()
+            self.thread_autopilot.start()
+        elif rb_recording:
+            self.thread_recording = RecordingThread()
+            self.thread_recording.start()
+        elif rb_training:
+            self.thread_training = TrainingThread()
+            self.thread_training.start()
+
+        # Deactivate radio boxes while on mode is active
+        self.ui.mode_autopilot.setEnabled(False)
+        self.ui.mode_training.setEnabled(False)
+        self.ui.mode_recording.setEnabled(False)
+
+        self.ui.b_mode.clicked.connect(self.leave_mode)
+        self.ui.b_mode.setText("Stop")
 
     def leave_mode(self):
         """
         b_mode:
         Stops the autopilot, recording or training.
         """
-        pass
+        rb_autopilot = self.ui.mode_autopilot.isChecked()
+        rb_recording = self.ui.mode_recording.isChecked()
+        rb_training = self.ui.mode_training.isChecked()
+
+        # Stop mode specific thread
+        if rb_autopilot:
+            self.thread_autopilot.stop()
+        elif rb_recording:
+            self.thread_recording.stop()
+        elif rb_training:
+            self.thread_training.stop()
+
+        self.ui.mode_autopilot.setEnabled(True)
+        self.ui.mode_training.setEnabled(True)
+        self.ui.mode_recording.setEnabled(True)
+
+        self.ui.b_mode.clicked.connect(self.enter_mode)
+        self.ui.b_mode.setText("Start")

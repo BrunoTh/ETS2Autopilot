@@ -177,6 +177,38 @@ class Data(object):
             else:
                 return []
 
+    def get_next_fileid(self):
+        result = self.db.execute("SELECT filename FROM image ORDER BY filename DESC LIMIT 1")
+        if result is None:
+            return 0
+        else:
+            filename = result[0][0]
+            return int(filename.split(".png")[0])+1
+
+    def get_image_list_filter(self, country=None, maneuver=None):
+        sql_where = ""
+        sql_conditions = []
+        sql_condition_values = []
+        if country is not None:
+            sql_where = " WHERE "
+            sql_conditions.append("cty.code=?")
+            sql_condition_values.append(country)
+
+        if maneuver is not None:
+            sql_where = " WHERE "
+            sql_conditions.append("img.maneuver=?")
+            sql_condition_values.append(maneuver)
+
+        result = self.db.execute("SELECT img.id, img.filename, img.steering, img.speed, img.throttle, img.maneuver, "
+                                 "cty.code FROM image img "
+                                 "LEFT JOIN sequence seq ON img.sequence = seq.id "
+                                 "LEFT JOIN country cty ON cty.id = seq.country "
+                                 "%s%s" % (sql_where, " AND ".join(sql_conditions)), tuple(sql_condition_values))
+        if type(result) == str and result.startswith("ERROR"):
+            return []
+        else:
+            return result
+
     def add_sequence(self, country=None, road_type=-1):
         """
         Creates a new sequence in db

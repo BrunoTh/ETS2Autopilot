@@ -16,6 +16,9 @@ class SequenceUI(object):
 
         # Register actions
         self.ui.list_images.clicked.connect(self.show_image)
+        self.ui.b_noIndicator.clicked.connect(self.set_no_indicator)
+        self.ui.b_leftIndicator.clicked.connect(self.set_left_indicator)
+        self.ui.b_rightIndicator.clicked.connect(self.set_right_indicator)
 
     def show(self):
         self.fill_image_list()
@@ -56,3 +59,18 @@ class SequenceUI(object):
         img_data = Data().get_image_data(img_id)
         pixmap = QtGui.QPixmap(os.path.join("captured", img_data[1]))
         self.ui.captured_image.setPixmap(pixmap)
+
+    def _update_maneuver(self, maneuver):
+        img_id = self._get_selected_image()
+        img_data = Data().get_image_data(img_id)
+        if img_data is not None:
+            Data().set_image_maneuver(img_data[1], maneuver)
+
+    def set_no_indicator(self):
+        self._update_maneuver(0)
+
+    def set_left_indicator(self):
+        self._update_maneuver(1)
+
+    def set_right_indicator(self):
+        self._update_maneuver(2)

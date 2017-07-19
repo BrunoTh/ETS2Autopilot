@@ -93,12 +93,15 @@ class Settings(object):
         """
         result = self.db.execute("SELECT value FROM settings WHERE key=?", (key,))
         if len(result) > 0 and result != "ERROR":
-            return result[0][0]
+            try:
+                return int(result[0][0])
+            except Exception:
+                return result[0][0]
         else:
             return None
 
     def set_value(self, key, value):
-        if not self.get_value(key):
+        if self.get_value(key) is None:
             self.db.execute("INSERT INTO settings (key, value) VALUES (?,?)", (key, value,))
         else:
             self.db.execute("UPDATE settings SET value=? WHERE key=?", (value, key,))

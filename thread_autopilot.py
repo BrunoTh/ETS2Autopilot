@@ -12,8 +12,14 @@ import functions
 
 
 class AutopilotThread(threading.Thread):
+    print_lock = threading.Lock()
+    running = True
+
     def __init__(self, controller_thread, steering_wheel, image_front):
         threading.Thread.__init__(self)
+
+        with AutopilotThread.print_lock:
+            AutopilotThread.running = True
 
         pygame.init()
         pygame.joystick.init()
@@ -34,13 +40,8 @@ class AutopilotThread(threading.Thread):
         saver.restore(self.sess, "save/model_%s.ckpt" % self.country_code)
 
     def stop(self):
-        self.running = False
-
-    def set_image(self, cv_image, ui_element):
-        qimg = QtGui.QImage(cv_image, cv_image.shape[1], cv_image.shape[0], cv_image.strides[0], QtGui.QImage.Format_RGB888)
-        pixmap = QtGui.QPixmap(qimg)
-        pixmap = pixmap.scaledToHeight(ui_element.height())
-        ui_element.setPixmap(pixmap)
+        with AutopilotThread.print_lock:
+            AutopilotThread.running = False
 
     def run(self):
         # Settings instance
@@ -52,7 +53,7 @@ class AutopilotThread(threading.Thread):
         # Previous value of steering (gamepad)
         manual_steering_prev = 0
 
-        while(self.running):
+        while AutopilotThread.running:
             pygame.event.pump()
 
             # Button to activate/deactivate autopilot

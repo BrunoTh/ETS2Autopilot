@@ -6,24 +6,42 @@ import cv2
 from database import Settings, Data
 import speed_detection
 import functions
+import time
 
 
 class RecordingThread(threading.Thread):
-    def __init__(self):
+    print_lock = threading.Lock()
+    running = True
+
+    def __init__(self, image_front):
         threading.Thread.__init__(self)
+        with RecordingThread.print_lock:
+            RecordingThread.running = True
+        self.image_front = image_front
         self.running = True
         self.joystick = pygame.joystick.Joystick(Settings().get_value(Settings.CONTROLLER))
 
     def stop(self):
-        self.running = False
+        with RecordingThread.print_lock:
+            RecordingThread.running = False
 
     def run(self):
         s = Settings()
         d = Data()
 
         img_id = d.get_next_fileid()
+        recording = False
+        recording_button_prev = 0
 
-        while(self.running):
+        maneuver = 0  # 0 - normal, 1 - indicator left, 2 - indicator right
+        indicator_left = False
+        indicator_left_prev = 0
+        indicator_right = False
+        indicator_right_prev = 0
+
+        last_record = 0
+
+        while RecordingThread.running:
             pygame.event.pump()
             recording_button_act = self.joystick.get_button(s.get_value(Settings.AUTOPILOT))
             if recording_button_act != recording_button_prev and recording_button_act == 1:
@@ -75,7 +93,8 @@ class RecordingThread(threading.Thread):
             resized = cv2.resize(main, (round(ratio * 100), 100))
 
             # cv2.imshow('cap', dilated)
-            cv2.imshow('resized', resized)
+            # cv2.imshow('resized', resized)
+            functions.set_image(resized, self.image_front)
 
             axis = self.joystick.get_axis(s.get_value(Settings.STEERING_AXIS)) * 180  # -180 to 180 "degrees"
             throttle = self.joystick.get_axis(s.get_value(Settings.THROTTLE_AXIS)) * 100  # -100=full throttle, 100=full brake
@@ -83,8 +102,11 @@ class RecordingThread(threading.Thread):
             speed = speed_detection.get_speed(frame)
 
             # Save frame every 150ms
-            if recording and (functions.current_milli_time() - last_record) >= 150:
+            #if recording and (functions.current_milli_time() - last_record) >= 150:
+            if recording:
                 last_record = functions.current_milli_time()
                 cv2.imwrite("captured/%d.png" % img_id, resized)
                 d.add_image("%d.png" % img_id, axis, speed, throttle, maneuver, sequence_id)
                 img_id += 1
+
+            time.sleep(0.150)

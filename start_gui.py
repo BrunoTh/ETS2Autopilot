@@ -1,6 +1,7 @@
 import sys
 import os
 from PyQt5.QtWidgets import QApplication, QMainWindow
+print("Loading...")
 from UI.main import MainUI
 from database import Settings
 

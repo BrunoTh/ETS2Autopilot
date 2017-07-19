@@ -47,6 +47,17 @@ class MainUI(object):
             self.thread_controller = ControllerThread()
             self.thread_controller.start()
 
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.thread_controller is not None and self.thread_controller.is_alive():
+            print(self.thread_controller.is_alive())
+            self.thread_controller.stop()
+        if self.thread_autopilot is not None and self.thread_autopilot.is_alive():
+            self.thread_autopilot.stop()
+        if self.thread_recording is not None and self.thread_recording.is_alive():
+            self.thread_recording.stop()
+        if self.thread_training is not None and self.thread_training.is_alive():
+            self.thread_training.stop()
+
     def show(self):
         self.window.show()
 
@@ -125,23 +136,12 @@ class MainUI(object):
             self.sequence_ui.set_sequence_id(sid)
             self.sequence_ui.show()
 
-    def fill_front_image(self):
-        """
-        Fill image_front.
-        """
-        pass
-
-    def fill_steering_wheel(self):
-        """
-        Fill steering_wheel.
-        """
-        pass
-
     def enter_mode(self):
         """
         b_mode:
         Starts the autopilot, recording or training.
         """
+        print("Entering")
         rb_autopilot = self.ui.mode_autopilot.isChecked()
         rb_recording = self.ui.mode_recording.isChecked()
         rb_training = self.ui.mode_training.isChecked()
@@ -156,10 +156,10 @@ class MainUI(object):
 
         # Start mode specific thread
         if rb_autopilot:
-            self.thread_autopilot = AutopilotThread()
+            self.thread_autopilot = AutopilotThread(self.thread_controller, self.ui.steering_wheel, self.ui.image_front)
             self.thread_autopilot.start()
         elif rb_recording:
-            self.thread_recording = RecordingThread()
+            self.thread_recording = RecordingThread(self.ui.image_front)
             self.thread_recording.start()
         elif rb_training:
             self.thread_training = TrainingThread()
@@ -170,6 +170,7 @@ class MainUI(object):
         self.ui.mode_training.setEnabled(False)
         self.ui.mode_recording.setEnabled(False)
 
+        self.ui.b_mode.clicked.disconnect()
         self.ui.b_mode.clicked.connect(self.leave_mode)
         self.ui.b_mode.setText("Stop")
 
@@ -185,14 +186,18 @@ class MainUI(object):
         # Stop mode specific thread
         if rb_autopilot:
             self.thread_autopilot.stop()
+            self.thread_autopilot = None
         elif rb_recording:
             self.thread_recording.stop()
+            self.thread_recording = None
         elif rb_training:
             self.thread_training.stop()
+            self.thread_training = None
 
         self.ui.mode_autopilot.setEnabled(True)
         self.ui.mode_training.setEnabled(True)
         self.ui.mode_recording.setEnabled(True)
 
+        self.ui.b_mode.clicked.disconnect()
         self.ui.b_mode.clicked.connect(self.enter_mode)
         self.ui.b_mode.setText("Start")

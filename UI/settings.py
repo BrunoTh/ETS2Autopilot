@@ -83,17 +83,17 @@ class SettingsUI(object):
             self.ui.slider_top.setValue(self.ui.slider_top.minimum())
 
         # Display key bindings
-        if vjoy:
+        if vjoy is not None:
             self.ui.e_vjoy.setText(str(vjoy))
-        if autopilot:
+        if autopilot is not None:
             self.ui.e_autopilot.setText(str(autopilot))
-        if left_indicator:
+        if left_indicator is not None:
             self.ui.e_leftIndicator.setText(str(left_indicator))
-        if right_indicator:
+        if right_indicator is not None:
             self.ui.e_rightIndicator.setText(str(right_indicator))
-        if steering_axis:
+        if steering_axis is not None:
             self.ui.e_steering.setText(str(steering_axis))
-        if throttle_axis:
+        if throttle_axis is not None:
             self.ui.e_throttle.setText(str(throttle_axis))
 
         self.fill_screen_cap()

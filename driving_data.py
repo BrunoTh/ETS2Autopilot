@@ -40,80 +40,80 @@ sequence.txt information:
     - 4: indicator (0: none, 1: left, 2: right)
 """
 
-settings = Settings()
-data = Data()
 
-country_string = settings.get_value(Settings.COUNTRIES_MODEL)
-countries = country_string.split(",")
+class DrivingData(object):
+    def __init__(self):
+        self.settings = Settings()
+        self.data = Data()
 
-xs = []
-ys = []
+        country_string = self.settings.get_value(Settings.COUNTRIES_MODEL)
+        countries = country_string.split(",")
 
-# points to the end of the last batch
-train_batch_pointer = 0
-val_batch_pointer = 0
+        self.xs = []
+        self.ys = []
 
-# Get all images
-image_list = []
+        # points to the end of the last batch
+        train_batch_pointer = 0
+        val_batch_pointer = 0
 
-for country in countries:
-    image_list += data.get_image_list_filter(country=country, maneuver=0)
+        # Get all images
+        self.image_list = []
 
-for image in image_list:
-    steering_deg = float(image[2]) * scipy.pi / 180
-    # higher steering angles are rare, so add four times
-    # if abs(steering_deg) > 40:
-    #    for i in range(int(steering_deg/10-2)*4):
-    #        xs.append("../captured/" + line.split()[0])
-    #        ys.append(steering_deg)
+        for country in countries:
+            self.image_list += self.data.get_image_list_filter(country=country, maneuver=0)
 
-    xs.append(os.path.join("captured/", image[1]))
-    # the paper by Nvidia uses the inverse of the turning radius,
-    # but steering wheel angle is proportional to the inverse of turning radius
-    # so the steering wheel angle in radians is used as the output
-    ys.append(steering_deg)
+        for image in self.image_list:
+            self.steering_deg = float(image[2]) * scipy.pi / 180
+            # higher steering angles are rare, so add four times
+            # if abs(steering_deg) > 40:
+            #    for i in range(int(steering_deg/10-2)*4):
+            #        xs.append("../captured/" + line.split()[0])
+            #        ys.append(steering_deg)
 
-# get number of images
-num_images = len(xs)
+            self.xs.append(os.path.join("captured/", image[1]))
+            # the paper by Nvidia uses the inverse of the turning radius,
+            # but steering wheel angle is proportional to the inverse of turning radius
+            # so the steering wheel angle in radians is used as the output
+            self.ys.append(self.steering_deg)
 
-# shuffle list of images
-c = list(zip(xs, ys))
-random.shuffle(c)
-xs, ys = zip(*c)
+        # get number of images
+        self.num_images = len(self.xs)
 
-# Training data
-train_xs = xs[:int(len(xs) * 0.8)]
-train_ys = ys[:int(len(xs) * 0.8)]
+        # shuffle list of images
+        self.c = list(zip(self.xs, self.ys))
+        random.shuffle(self.c)
+        self.xs, self.ys = zip(*self.c)
 
-# Validation data
-val_xs = xs[-int(len(xs) * 0.2):]
-val_ys = ys[-int(len(xs) * 0.2):]
+        # Training data
+        self.train_xs = self.xs[:int(len(self.xs) * 0.8)]
+        self.train_ys = self.ys[:int(len(self.xs) * 0.8)]
 
-num_train_images = len(train_xs)
-num_val_images = len(val_xs)
+        # Validation data
+        self.val_xs = self.xs[-int(len(self.xs) * 0.2):]
+        self.val_ys = self.ys[-int(len(self.xs) * 0.2):]
 
-print("Total data:", len(xs), num_images)
-print("Training data:", len(train_xs))
-print("Validation data:", len(val_xs))
+        self.num_train_images = len(self.train_xs)
+        self.num_val_images = len(self.val_xs)
+
+        print("Total data:", len(self.xs), self.num_images)
+        print("Training data:", len(self.train_xs))
+        print("Validation data:", len(self.val_xs))
+
+    def LoadTrainBatch(self, batch_size):
+        x_out = []
+        y_out = []
+        for i in range(0, batch_size):
+            x_out.append(scipy.misc.imresize(scipy.misc.imread(self.train_xs[(self.train_batch_pointer + i) % self.num_train_images])[-150:], [66, 200]) / 255.0)
+            y_out.append([self.train_ys[(self.train_batch_pointer + i) % self.num_train_images]])
+        self.train_batch_pointer += batch_size
+        return x_out, y_out
 
 
-def LoadTrainBatch(batch_size):
-    global train_batch_pointer
-    x_out = []
-    y_out = []
-    for i in range(0, batch_size):
-        x_out.append(scipy.misc.imresize(scipy.misc.imread(train_xs[(train_batch_pointer + i) % num_train_images])[-150:], [66, 200]) / 255.0)
-        y_out.append([train_ys[(train_batch_pointer + i) % num_train_images]])
-    train_batch_pointer += batch_size
-    return x_out, y_out
-
-
-def LoadValBatch(batch_size):
-    global val_batch_pointer
-    x_out = []
-    y_out = []
-    for i in range(0, batch_size):
-        x_out.append(scipy.misc.imresize(scipy.misc.imread(val_xs[(val_batch_pointer + i) % num_val_images])[-150:], [66, 200]) / 255.0)
-        y_out.append([val_ys[(val_batch_pointer + i) % num_val_images]])
-    val_batch_pointer += batch_size
-    return x_out, y_out
+    def LoadValBatch(self, batch_size):
+        x_out = []
+        y_out = []
+        for i in range(0, batch_size):
+            x_out.append(scipy.misc.imresize(scipy.misc.imread(self.val_xs[(self.val_batch_pointer + i) % self.num_val_images])[-150:], [66, 200]) / 255.0)
+            y_out.append([self.val_ys[(self.val_batch_pointer + i) % self.num_val_images]])
+        self.val_batch_pointer += batch_size
+        return x_out, y_out

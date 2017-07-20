@@ -92,7 +92,7 @@ class MainUI(object):
                 item = QStandardItem(sequence[1])
                 item.setEditable(False)
                 item.setData(str(sequence[0]), QtCore.Qt.UserRole)
-                model.appendRow(item)
+                model.insertRow(0, item)
         sequence_list.setModel(model)
 
     def fill_sequence_data_fields(self):
@@ -158,7 +158,7 @@ class MainUI(object):
             self.thread_autopilot = AutopilotThread(self.thread_controller, self.ui.steering_wheel, self.ui.image_front)
             self.thread_autopilot.start()
         elif rb_recording:
-            self.thread_recording = RecordingThread(self.ui.image_front)
+            self.thread_recording = RecordingThread(self.ui.image_front, self.fill_sequence_list)
             self.thread_recording.start()
         elif rb_training:
             self.thread_training = TrainingThread()

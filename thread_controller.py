@@ -24,6 +24,8 @@ class ControllerThread(threading.Thread):
             ControllerThread.running = False
 
     def run(self):
+        if pygame.joystick.get_init():
+            pygame.joystick.quit()
         pygame.init()
         pygame.joystick.init()
         joystick = pygame.joystick.Joystick(self.controller)

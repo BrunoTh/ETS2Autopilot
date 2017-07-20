@@ -53,6 +53,9 @@ class AutopilotThread(threading.Thread):
         # Previous value of steering (gamepad)
         manual_steering_prev = 0
 
+        img = cv2.imread('steering_wheel_image.jpg', 0)
+        rows, cols = img.shape
+
         while AutopilotThread.running:
             pygame.event.pump()
 
@@ -76,15 +79,16 @@ class AutopilotThread(threading.Thread):
 
             # Get frame of game
             frame_raw = ImageGrab.grab(bbox=functions.get_screen_bbox())
-            frame = cv2.cvtColor(np.array(frame_raw), cv2.COLOR_RGB2BGR)
+            frame = np.uint8(frame_raw)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
             # Relevant image region for steering angle prediction
             main = frame[s.get_value(Settings.IMAGE_FRONT_BORDER_TOP):s.get_value(Settings.IMAGE_FRONT_BORDER_BOTTOM),
-                         s.get_value(Settings.IMAGE_FRONT_BORDER_LEFT): s.get_value(Settings.IMAGE_FRONT_BORDER_RIGHT)]
+                         s.get_value(Settings.IMAGE_FRONT_BORDER_LEFT):s.get_value(Settings.IMAGE_FRONT_BORDER_RIGHT)]
             # Resize the image to the size of the neural network input layer
             image = scipy.misc.imresize(main, [66, 200]) / 255.0
             # Let the neural network predict the new steering angle
-            y_eval = model.y.eval(feed_dict={model.x: [image], model.keep_prob: 1.0})[0][0]
+            y_eval = model.y.eval(session=self.sess, feed_dict={model.x: [image], model.keep_prob: 1.0})[0][0]
             degrees = y_eval * 180 / scipy.pi
             steering = int(round((degrees + 180) / 180 * 32768 / 2))  # Value for vjoy controller
 
@@ -92,4 +96,8 @@ class AutopilotThread(threading.Thread):
             if autopilot:
                 self.controller_thread.set_angle(steering)
 
-            self.set_image(main, self.image_front)
+            M = cv2.getRotationMatrix2D((cols / 2, rows / 2), -degrees, 1)
+            dst = cv2.warpAffine(img, M, (cols, rows))
+            functions.set_image(dst.copy(), self.steering_wheel)
+
+            functions.set_image(main.copy(), self.image_front)

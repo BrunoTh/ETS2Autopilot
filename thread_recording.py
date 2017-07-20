@@ -13,13 +13,14 @@ class RecordingThread(threading.Thread):
     print_lock = threading.Lock()
     running = True
 
-    def __init__(self, image_front):
+    def __init__(self, image_front, fill_sequence_list):
         threading.Thread.__init__(self)
         with RecordingThread.print_lock:
             RecordingThread.running = True
         self.image_front = image_front
         self.running = True
         self.joystick = pygame.joystick.Joystick(Settings().get_value(Settings.CONTROLLER))
+        self.fill_sequence_list = fill_sequence_list
 
     def stop(self):
         with RecordingThread.print_lock:
@@ -49,6 +50,8 @@ class RecordingThread(threading.Thread):
 
                 if recording:  # started recording
                     sequence_id = d.add_sequence(country=s.get_value(Settings.COUNTRY_DEFAULT))
+                else:  # stopped recording
+                    self.fill_sequence_list()
 
             recording_button_prev = recording_button_act
 
@@ -79,7 +82,8 @@ class RecordingThread(threading.Thread):
 
             # Capture the whole game
             frame_raw = ImageGrab.grab(bbox=functions.get_screen_bbox())
-            frame = cv2.cvtColor(np.array(frame_raw), cv2.COLOR_RGB2BGR)
+            frame = np.uint8(frame_raw)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
             main = frame[s.get_value(Settings.IMAGE_FRONT_BORDER_TOP):s.get_value(Settings.IMAGE_FRONT_BORDER_BOTTOM),
                          s.get_value(Settings.IMAGE_FRONT_BORDER_LEFT): s.get_value(Settings.IMAGE_FRONT_BORDER_RIGHT)]
@@ -94,7 +98,7 @@ class RecordingThread(threading.Thread):
 
             # cv2.imshow('cap', dilated)
             # cv2.imshow('resized', resized)
-            functions.set_image(resized, self.image_front)
+            functions.set_image(main.copy(), self.image_front)
 
             axis = self.joystick.get_axis(s.get_value(Settings.STEERING_AXIS)) * 180  # -180 to 180 "degrees"
             throttle = self.joystick.get_axis(s.get_value(Settings.THROTTLE_AXIS)) * 100  # -100=full throttle, 100=full brake
@@ -102,11 +106,11 @@ class RecordingThread(threading.Thread):
             speed = speed_detection.get_speed(frame)
 
             # Save frame every 150ms
-            #if recording and (functions.current_milli_time() - last_record) >= 150:
-            if recording:
+            if recording and (functions.current_milli_time() - last_record) >= 150:
+            #if recording:
                 last_record = functions.current_milli_time()
                 cv2.imwrite("captured/%d.png" % img_id, resized)
                 d.add_image("%d.png" % img_id, axis, speed, throttle, maneuver, sequence_id)
                 img_id += 1
 
-            time.sleep(0.150)
+            #time.sleep(0.150)

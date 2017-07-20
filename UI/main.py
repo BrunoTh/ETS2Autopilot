@@ -141,7 +141,6 @@ class MainUI(object):
         b_mode:
         Starts the autopilot, recording or training.
         """
-        print("Entering")
         rb_autopilot = self.ui.mode_autopilot.isChecked()
         rb_recording = self.ui.mode_recording.isChecked()
         rb_training = self.ui.mode_training.isChecked()

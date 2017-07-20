@@ -7,13 +7,14 @@ from database import Settings
 class ControllerThread(threading.Thread):
     print_lock = threading.Lock()
     running = True
+    angle = 0
 
     def __init__(self):
         threading.Thread.__init__(self)
         ControllerThread.running = True
-        self.controller = int(Settings().get_value(Settings.CONTROLLER))
-        self.vjoy = int(Settings().get_value(Settings.VJOY_DEVICE))
-        self.axis = int(Settings().get_value(Settings.STEERING_AXIS))
+        self.controller = Settings().get_value(Settings.CONTROLLER)
+        self.vjoy = Settings().get_value(Settings.VJOY_DEVICE)
+        self.axis = Settings().get_value(Settings.STEERING_AXIS)
         self.running = True
         self.autopilot = False
         self.angle = 0
@@ -35,7 +36,7 @@ class ControllerThread(threading.Thread):
             if not self.autopilot:
                 angle = round((joystick.get_axis(self.axis) + 1) * 32768 / 2)
             else:
-                angle = self.angle
+                angle = ControllerThread.angle
 
             vjoy.set_axis(pyvjoy.HID_USAGE_Y, angle)
 
@@ -46,4 +47,5 @@ class ControllerThread(threading.Thread):
         self.autopilot = value
 
     def set_angle(self, value):
-        self.angle = value
+        with ControllerThread.print_lock:
+            ControllerThread.angle = value

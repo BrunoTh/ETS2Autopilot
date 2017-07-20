@@ -20,6 +20,7 @@ class Database(object):
                                     country INT,
                                     type INT DEFAULT -1,
                                     note VARCHAR(45),
+                                    controller_type INT,
                                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
                                     FOREIGN KEY(country) REFERENCES country(id)
                                 );""")
@@ -213,7 +214,7 @@ class Data(object):
         else:
             return result
 
-    def add_sequence(self, country=None, road_type=-1):
+    def add_sequence(self, country=None, road_type=-1, controller_type=0):
         """
         Creates a new sequence in db
         :return: ID of new sequence
@@ -224,13 +225,14 @@ class Data(object):
             else:
                 country = self.settings.get_value("country")
         cid = self.get_country_id(country)
-        return self.db.execute("INSERT INTO sequence (country, type) VALUES (?, ?)", (cid, road_type,))
+        return self.db.execute("INSERT INTO sequence (country, type, controller_type) VALUES (?, ?, ?)", (cid, road_type, controller_type,))
 
     def update_sequence(self, sid, country=None, road_type=None, note=None):
         """
         :param sid: id of sequence you want to update
         :param country: country code
         :param road_type: road type
+        :param note: note (up to 45 characters)
         :return:
         """
         if country is not None:

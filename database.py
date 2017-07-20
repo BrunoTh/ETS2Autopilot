@@ -19,6 +19,7 @@ class Database(object):
                                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                                     country INT,
                                     type INT DEFAULT -1,
+                                    note VARCHAR(45),
                                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
                                     FOREIGN KEY(country) REFERENCES country(id)
                                 );""")
@@ -225,7 +226,7 @@ class Data(object):
         cid = self.get_country_id(country)
         return self.db.execute("INSERT INTO sequence (country, type) VALUES (?, ?)", (cid, road_type,))
 
-    def update_sequence(self, sid, country=None, road_type=None):
+    def update_sequence(self, sid, country=None, road_type=None, note=None):
         """
         :param sid: id of sequence you want to update
         :param country: country code
@@ -237,6 +238,8 @@ class Data(object):
             self.db.execute("UPDATE sequence SET country=? WHERE id=?", (cid, sid,))
         if road_type is not None:
             self.db.execute("UPDATE sequence SET type=? WHERE id=?", (road_type, sid,))
+        if note is not None:
+            self.db.execute("UPDATE sequence SET note=? WHERE id=?", (note, sid,))
 
     def delete_sequence(self, sid):
         self.db.execute("DELETE FROM sequence WHERE id=?", (sid,))
@@ -245,7 +248,7 @@ class Data(object):
         """
         :return: List with all sequences (id,timestamp,country,type)
         """
-        result = self.db.execute("SELECT id, timestamp, country, type FROM sequence")
+        result = self.db.execute("SELECT id, timestamp, country, type, note FROM sequence")
         if type(result) == str and result.startswith("ERROR"):
             return []
         else:

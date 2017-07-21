@@ -6,6 +6,7 @@ import numpy as np
 import scipy.misc
 import pygame
 import cv2
+import time
 from database import Settings, Data
 import model
 import functions
@@ -72,6 +73,32 @@ class AutopilotThread(threading.Thread):
             axis = round((self.joystick.get_axis(self.steering_axis) + 1) * 32768 / 2)
             # Interrupt autopilot if manual steering was detected
             if abs(manual_steering_prev - axis) > 1000:
+                img_id = Data().get_next_fileid()
+                sequence_id = Data().add_sequence(note="correction")
+
+                # TODO: Deactivate this feature in settings
+                # Save the next 3 images
+                for i in range(3):
+                    # Get frame of game
+                    frame_raw = ImageGrab.grab(bbox=functions.get_screen_bbox())
+                    frame = np.uint8(frame_raw)
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+                    # Relevant image region for steering angle prediction
+                    main = frame[s.get_value(Settings.IMAGE_FRONT_BORDER_TOP):s.get_value(Settings.IMAGE_FRONT_BORDER_BOTTOM),
+                                 s.get_value(Settings.IMAGE_FRONT_BORDER_LEFT):s.get_value(Settings.IMAGE_FRONT_BORDER_RIGHT)]
+
+                    # Resize image to save some space (height = 100px)
+                    ratio = main.shape[1] / main.shape[0]
+                    resized = cv2.resize(main, (round(ratio * 100), 100))
+
+                    axis = self.joystick.get_axis(s.get_value(Settings.STEERING_AXIS)) * 180
+
+                    cv2.imwrite("captured/%d.png" % img_id, resized)
+                    Data().add_image("%d.png" % img_id, axis, 0, 0, 0, sequence_id)
+                    img_id += 1
+
+                    time.sleep(0.150)
                 autopilot = False
             manual_steering_prev = axis
 

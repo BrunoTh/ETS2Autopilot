@@ -13,7 +13,7 @@ class TrainingThread(threading.Thread):
     def __init__(self):
         self.driving_data = DrivingData()
         TrainingThread.running = True
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, daemon=True)
         country_string = Settings().get_value(Settings.COUNTRIES_MODEL)
         self.country = country_string.split(",")
 

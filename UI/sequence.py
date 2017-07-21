@@ -3,6 +3,7 @@ from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5 import QtCore, QtGui
 from UI.ui_sequence import Ui_MainWindow
 from database import Data
+import functions
 import os
 
 
@@ -19,6 +20,8 @@ class SequenceUI(object):
         self.ui.b_noIndicator.clicked.connect(self.set_no_indicator)
         self.ui.b_leftIndicator.clicked.connect(self.set_left_indicator)
         self.ui.b_rightIndicator.clicked.connect(self.set_right_indicator)
+        self.ui.b_delete.clicked.connect(self.delete_selection)
+
 
     def show(self):
         self.fill_image_list()
@@ -48,7 +51,7 @@ class SequenceUI(object):
         images = data.get_image_list(self.sequence_id)
         if len(images) > 0:
             for image in images:
-                item = QStandardItem(image[1])
+                item = QStandardItem("%s - %s" % (image[1], functions.get_indicator(image[5])))
                 item.setEditable(False)
                 item.setData(str(image[0]), QtCore.Qt.UserRole)
                 model.appendRow(item)
@@ -65,6 +68,7 @@ class SequenceUI(object):
         img_data = Data().get_image_data(img_id)
         if img_data is not None:
             Data().set_image_maneuver(img_data[1], maneuver)
+        self.fill_image_list()
 
     def set_no_indicator(self):
         self._update_maneuver(0)
@@ -74,3 +78,11 @@ class SequenceUI(object):
 
     def set_right_indicator(self):
         self._update_maneuver(2)
+
+    def delete_selection(self):
+        img_id = self._get_selected_image()
+        filename = Data().get_image_data(img_id)[1]
+        Data().delete_image(filename)
+        if os.path.exists(os.path.join("captured", filename)):
+            os.remove(os.path.join("captured", filename))
+        self.fill_image_list()

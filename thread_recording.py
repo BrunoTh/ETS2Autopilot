@@ -14,7 +14,7 @@ class RecordingThread(threading.Thread):
     running = True
 
     def __init__(self, image_front, fill_sequence_list):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, daemon=True)
         with RecordingThread.print_lock:
             RecordingThread.running = True
         self.image_front = image_front

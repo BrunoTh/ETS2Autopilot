@@ -10,7 +10,7 @@ class ControllerThread(threading.Thread):
     angle = 0
 
     def __init__(self):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, daemon=True)
         ControllerThread.running = True
         self.controller = Settings().get_value(Settings.CONTROLLER)
         self.vjoy = Settings().get_value(Settings.VJOY_DEVICE)

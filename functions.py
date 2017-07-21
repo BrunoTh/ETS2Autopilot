@@ -21,3 +21,12 @@ def set_image(cv_image, ui_element):
     pixmap = QtGui.QPixmap(qimg)
     pixmap = pixmap.scaledToHeight(ui_element.height())
     ui_element.setPixmap(pixmap)
+
+
+def get_indicator(value):
+    if value == 0:
+        return "None"
+    elif value == 1:
+        return "Left"
+    elif value == 2:
+        return "Right"

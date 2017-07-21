@@ -10,6 +10,7 @@ import time
 from database import Settings, Data
 import model
 import functions
+import os
 
 
 class AutopilotThread(threading.Thread):
@@ -17,7 +18,7 @@ class AutopilotThread(threading.Thread):
     running = True
 
     def __init__(self, controller_thread, steering_wheel, image_front):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, daemon=True)
 
         with AutopilotThread.print_lock:
             AutopilotThread.running = True
@@ -72,7 +73,7 @@ class AutopilotThread(threading.Thread):
             # Read the steering value of joystick
             axis = round((self.joystick.get_axis(self.steering_axis) + 1) * 32768 / 2)
             # Interrupt autopilot if manual steering was detected
-            if abs(manual_steering_prev - axis) > 1000:
+            if abs(manual_steering_prev - axis) > 1000 and autopilot:
                 img_id = Data().get_next_fileid()
                 sequence_id = Data().add_sequence(note="correction")
 

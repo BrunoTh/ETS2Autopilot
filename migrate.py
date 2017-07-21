@@ -17,7 +17,7 @@ def get_sid(sequences, img_id):
 
 
 def migrate():
-    data = Data()
+    data = Data(batch=True)
 
     sequences = []
     # read sequence.txt
@@ -41,3 +41,5 @@ def migrate():
 
             if datasets_writen % percent == 0:
                 print("%d %%" % round(datasets_writen/num_datasets*100))
+
+    data.append()

@@ -2,7 +2,7 @@ import sqlite3
 
 
 class Database(object):
-    def __init__(self):
+    def __init__(self, batch=False):
         sql_create_tables = list()
         sql_create_tables.append("""CREATE TABLE IF NOT EXISTS settings (
                                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,6 +37,7 @@ class Database(object):
                                 );""")
 
         self.conn = sqlite3.connect('data.sqlite')
+        self.batch = batch
 
         try:
             c = self.conn.cursor()
@@ -48,11 +49,15 @@ class Database(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.close()
 
+    def commit(self):
+        self.conn.commit()
+
     def execute(self, command, params=()):
         try:
             c = self.conn.cursor()
             c.execute(command, params)
-            self.conn.commit()
+            if not self.batch:
+                self.conn.commit()
             if command.startswith("INSERT"):
                 return c.lastrowid
             else:
@@ -113,9 +118,12 @@ class Settings(object):
 
 
 class Data(object):
-    def __init__(self):
-        self.db = Database()
+    def __init__(self, batch=False):
+        self.db = Database(batch)
         self.settings = Settings()
+
+    def append(self):
+        self.db.commit()
 
     def get_country_id(self, code):
         """

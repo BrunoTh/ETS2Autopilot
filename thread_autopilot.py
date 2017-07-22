@@ -56,8 +56,8 @@ class AutopilotThread(threading.Thread):
         # Previous value of steering (gamepad)
         manual_steering_prev = 0
 
-        img = cv2.imread('steering_wheel_image.jpg', 0)
-        rows, cols = img.shape
+        img_wheel = cv2.imread('steering_wheel_image.jpg', 0)
+        rows, cols = img_wheel.shape
 
         while AutopilotThread.running:
             pygame.event.pump()
@@ -77,8 +77,10 @@ class AutopilotThread(threading.Thread):
             if abs(manual_steering_prev - axis) > 1000 and autopilot:
                 img_id = Data().get_next_fileid()
                 sequence_id = Data().add_sequence(note="correction")
+                self.controller_thread.set_autopilot(False)
 
                 # TODO: Deactivate this feature in settings
+                # TODO: Amount of images to save in settings
                 # Save the next 3 images
                 for i in range(3):
                     # Get frame of game
@@ -128,8 +130,9 @@ class AutopilotThread(threading.Thread):
             else:
                 self.statusbar.showMessage("Autopilot inactive")
 
+            # TODO: Show steering wheel in GUI
             M = cv2.getRotationMatrix2D((cols / 2, rows / 2), -degrees, 1)
-            dst = cv2.warpAffine(img, M, (cols, rows))
-            functions.set_image(dst.copy(), self.steering_wheel)
+            dst = cv2.warpAffine(img_wheel, M, (cols, rows))
+            # functions.set_image(dst.copy(), self.steering_wheel)
 
             functions.set_image(main.copy(), self.image_front)

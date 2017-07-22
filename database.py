@@ -1,4 +1,5 @@
 import sqlite3
+import os
 
 
 class Database(object):
@@ -168,6 +169,9 @@ class Data(object):
     def delete_image(self, filename):
         self.db.execute("DELETE FROM image WHERE filename=?", (filename,))
 
+        if os.path.exists(os.path.join("captured", filename)):
+            os.remove(os.path.join("captured", filename))
+
     def get_image_list(self, sequence):
         """
         :param sequence: id of sequence
@@ -252,7 +256,13 @@ class Data(object):
             self.db.execute("UPDATE sequence SET note=? WHERE id=?", (note, sid,))
 
     def delete_sequence(self, sid):
+        images = self.get_image_list(sid)
         self.db.execute("DELETE FROM sequence WHERE id=?", (sid,))
+
+        # Remove all files
+        for image in images:
+            if os.path.exists(os.path.join("captured", image[1])):
+                os.remove(os.path.join("captured", image[1]))
 
     def get_sequence_list(self):
         """

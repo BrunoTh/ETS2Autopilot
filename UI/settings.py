@@ -5,6 +5,7 @@ import numpy as np
 import cv2
 import pygame
 from UI.ui_settings import Ui_MainWindow
+from UI.thread_joydetection import DetectorThread
 from database import Settings
 import functions
 import sys
@@ -19,6 +20,8 @@ class SettingsUI(object):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.window)
 
+        self.detection_thread = None
+
         # Register actions
         self.ui.b_refreshImage.clicked.connect(self.fill_screen_cap)
         self.ui.b_save.clicked.connect(self.save_settings)
@@ -32,6 +35,11 @@ class SettingsUI(object):
         self.ui.cb_screen.currentIndexChanged.connect(self.select_screen)
 
         self.ui.b_refreshDevices.clicked.connect(self.fill_device_list)
+        self.ui.b_setLeftIndicator.clicked.connect(lambda: self.start_detection_thread(self.ui.e_leftIndicator))
+        self.ui.b_setRightIndicator.clicked.connect(lambda: self.start_detection_thread(self.ui.e_rightIndicator))
+        self.ui.b_setAutopilot.clicked.connect(lambda: self.start_detection_thread(self.ui.e_autopilot))
+        self.ui.b_setSteering.clicked.connect(lambda: self.start_detection_thread(self.ui.e_steering))
+        self.ui.b_setThrottle.clicked.connect(lambda: self.start_detection_thread(self.ui.e_throttle))
 
     def show(self):
         self._load_settings()
@@ -179,3 +187,10 @@ class SettingsUI(object):
             self.ui.slider_top.setValue(slider_bottom)
 
         self.fill_screen_cap()
+
+    def start_detection_thread(self, field):
+        if self.detection_thread is not None and self.detection_thread.is_alive():
+            self.detection_thread.stop()
+
+        self.detection_thread = DetectorThread(self.ui.cb_devices.currentIndex(), field)
+        self.detection_thread.start()

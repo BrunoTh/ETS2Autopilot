@@ -10,20 +10,22 @@ import time
 
 
 class RecordingThread(threading.Thread):
-    print_lock = threading.Lock()
+    lock = threading.Lock()
     running = True
 
-    def __init__(self, image_front, fill_sequence_list):
+    def __init__(self, statusbar, image_front, fill_sequence_list):
         threading.Thread.__init__(self, daemon=True)
-        with RecordingThread.print_lock:
+        with RecordingThread.lock:
             RecordingThread.running = True
+
+        self.statusbar = statusbar
         self.image_front = image_front
         self.running = True
         self.joystick = pygame.joystick.Joystick(Settings().get_value(Settings.CONTROLLER))
         self.fill_sequence_list = fill_sequence_list
 
     def stop(self):
-        with RecordingThread.print_lock:
+        with RecordingThread.lock:
             RecordingThread.running = False
 
     def run(self):
@@ -80,6 +82,11 @@ class RecordingThread(threading.Thread):
             else:
                 maneuver = 0
 
+            if recording:
+                self.statusbar.showMessage("Recording: active | Indicator: %s" % functions.get_indicator(maneuver))
+            else:
+                self.statusbar.showMessage("Recording: inactive | Indicator: %s" % functions.get_indicator(maneuver))
+
             # Capture the whole game
             frame_raw = ImageGrab.grab(bbox=functions.get_screen_bbox())
             frame = np.uint8(frame_raw)
@@ -107,10 +114,7 @@ class RecordingThread(threading.Thread):
 
             # Save frame every 150ms
             if recording and (functions.current_milli_time() - last_record) >= 150:
-            #if recording:
                 last_record = functions.current_milli_time()
                 cv2.imwrite("captured/%d.png" % img_id, resized)
                 d.add_image("%d.png" % img_id, axis, speed, throttle, maneuver, sequence_id)
                 img_id += 1
-
-            #time.sleep(0.150)

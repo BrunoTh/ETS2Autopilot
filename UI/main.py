@@ -158,13 +158,13 @@ class MainUI(object):
 
         # Start mode specific thread
         if rb_autopilot:
-            self.thread_autopilot = AutopilotThread(self.thread_controller, self.ui.steering_wheel, self.ui.image_front)
+            self.thread_autopilot = AutopilotThread(self.ui.statusbar, self.thread_controller, self.ui.steering_wheel, self.ui.image_front)
             self.thread_autopilot.start()
         elif rb_recording:
-            self.thread_recording = RecordingThread(self.ui.image_front, self.fill_sequence_list)
+            self.thread_recording = RecordingThread(self.ui.statusbar, self.ui.image_front, self.fill_sequence_list)
             self.thread_recording.start()
         elif rb_training:
-            self.thread_training = TrainingThread()
+            self.thread_training = TrainingThread(self.ui.statusbar)
             self.thread_training.start()
 
         # Deactivate radio boxes while on mode is active

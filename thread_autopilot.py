@@ -14,18 +14,19 @@ import os
 
 
 class AutopilotThread(threading.Thread):
-    print_lock = threading.Lock()
+    lock = threading.Lock()
     running = True
 
-    def __init__(self, controller_thread, steering_wheel, image_front):
+    def __init__(self, statusbar, controller_thread, steering_wheel, image_front):
         threading.Thread.__init__(self, daemon=True)
 
-        with AutopilotThread.print_lock:
+        with AutopilotThread.lock:
             AutopilotThread.running = True
 
         pygame.init()
         pygame.joystick.init()
 
+        self.statusbar = statusbar
         self.controller_thread = controller_thread
         self.steering_wheel = steering_wheel
         self.image_front = image_front
@@ -42,7 +43,7 @@ class AutopilotThread(threading.Thread):
         saver.restore(self.sess, "save/model_%s.ckpt" % self.country_code)
 
     def stop(self):
-        with AutopilotThread.print_lock:
+        with AutopilotThread.lock:
             AutopilotThread.running = False
 
     def run(self):
@@ -123,6 +124,9 @@ class AutopilotThread(threading.Thread):
             # Set the value of the vjoy joystick to the predicted steering angle
             if autopilot:
                 self.controller_thread.set_angle(steering)
+                self.statusbar.showMessage("Autopilot active")
+            else:
+                self.statusbar.showMessage("Autopilot inactive")
 
             M = cv2.getRotationMatrix2D((cols / 2, rows / 2), -degrees, 1)
             dst = cv2.warpAffine(img, M, (cols, rows))

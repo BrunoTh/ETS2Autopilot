@@ -7,15 +7,23 @@ from database import Settings
 
 
 class TrainingThread(threading.Thread):
-    print_lock = threading.Lock()
+    lock = threading.Lock()
     running = True
 
-    def __init__(self):
+    def __init__(self, statusbar):
         self.driving_data = DrivingData()
-        TrainingThread.running = True
+        with TrainingThread.lock:
+            TrainingThread.running = True
+
         threading.Thread.__init__(self, daemon=True)
+
+        self.statusbar = statusbar
         country_string = Settings().get_value(Settings.COUNTRIES_MODEL)
         self.country = country_string.split(",")
+
+    def stop(self):
+        with TrainingThread.lock:
+            TrainingThread.running = False
 
     def run(self):
         LOGDIR = './save'
@@ -59,7 +67,8 @@ class TrainingThread(threading.Thread):
                 if i % 10 == 0:
                     xs, ys = self.driving_data.LoadValBatch(batch_size)
                     loss_value = loss.eval(feed_dict={model.x: xs, model.y_: ys, model.keep_prob: 1.0})
-                    print("Epoch: %d, Step: %d, Loss: %g" % (epoch, epoch * batch_size + i, loss_value))
+                    self.statusbar.showMessage("Epoch: %d, Step: %d, Loss: %g" % (epoch, epoch * batch_size + i, loss_value))
+                    #print("Epoch: %d, Step: %d, Loss: %g" % (epoch, epoch * batch_size + i, loss_value))
 
                 # write logs at every iteration
                 summary = merged_summary_op.eval(feed_dict={model.x: xs, model.y_: ys, model.keep_prob: 1.0})
@@ -71,4 +80,5 @@ class TrainingThread(threading.Thread):
                     checkpoint_path = os.path.join(LOGDIR, "model_%s.ckpt" % self.country[0])
                     filename = saver.save(sess, checkpoint_path)
             if loss_value < 0.25:
+
                 return None

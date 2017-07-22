@@ -2,6 +2,7 @@
 .idea
 *.sqlite
 captured/
+save/
 
 ### Python template
 # Byte-compiled / optimized / DLL files

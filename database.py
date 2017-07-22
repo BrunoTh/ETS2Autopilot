@@ -226,7 +226,7 @@ class Data(object):
         else:
             return result
 
-    def add_sequence(self, country=None, road_type=-1, controller_type=0, note=None):
+    def add_sequence(self, country=None, road_type=-1, controller_type=0, note=None, timestamp=None):
         """
         Creates a new sequence in db
         :return: ID of new sequence
@@ -237,7 +237,12 @@ class Data(object):
             else:
                 country = self.settings.get_value("country")
         cid = self.get_country_id(country)
-        return self.db.execute("INSERT INTO sequence (country, type, controller_type, note) VALUES (?, ?, ?, ?)", (cid, road_type, controller_type, note,))
+
+        if timestamp:
+            result = self.db.execute("INSERT INTO sequence (country, type, controller_type, note, timestamp) VALUES (?, ?, ?, ?, ?)", (cid, road_type, controller_type, note, str(timestamp),))
+        else:
+            result = self.db.execute("INSERT INTO sequence (country, type, controller_type, note) VALUES (?, ?, ?, ?)", (cid, road_type, controller_type, note,))
+        return result
 
     def update_sequence(self, sid, country=None, road_type=None, note=None):
         """

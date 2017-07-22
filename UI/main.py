@@ -92,7 +92,7 @@ class MainUI(object):
                 note = ""
                 if sequence[4] is not None:
                     note = " - %s" % sequence[4]
-                item = QStandardItem(sequence[1] + note)
+                item = QStandardItem("%s%s" % (sequence[1], note))
                 item.setEditable(False)
                 item.setData(str(sequence[0]), QtCore.Qt.UserRole)
                 model.insertRow(0, item)

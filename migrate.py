@@ -1,4 +1,6 @@
 from database import Data, Settings
+import datetime
+import os
 
 """
 data.txt information:
@@ -25,7 +27,8 @@ def migrate():
         for line in f:
             split = line.split()
             # Start, End, Country, Type
-            sid = data.add_sequence(split[2], int(split[3]))
+            timestamp = datetime.datetime.fromtimestamp(round(os.path.getctime(os.path.join("captured", "%s.png" % split[0])))).strftime("%Y-%m-%d %H:%M:%S")
+            sid = data.add_sequence(split[2], int(split[3]), timestamp=timestamp)
             sequences.append([int(split[0]), int(split[1]), sid])
 
     # read data.txt

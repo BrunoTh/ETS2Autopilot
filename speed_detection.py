@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import os
-import settings
+from database import Data
 
 
 ### TRAINING ###

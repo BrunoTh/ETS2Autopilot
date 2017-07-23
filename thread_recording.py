@@ -7,6 +7,7 @@ from database import Settings, Data
 import speed_detection
 import functions
 import time
+import os
 
 
 class RecordingThread(threading.Thread):
@@ -23,6 +24,9 @@ class RecordingThread(threading.Thread):
         self.running = True
         self.joystick = pygame.joystick.Joystick(Settings().get_value(Settings.CONTROLLER))
         self.fill_sequence_list = fill_sequence_list
+
+        if not os.path.exists("captured/"):
+            os.mkdir("captured")
 
     def stop(self):
         with RecordingThread.lock:

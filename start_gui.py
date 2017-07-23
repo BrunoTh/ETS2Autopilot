@@ -11,6 +11,9 @@ dbs = Settings()
 # MIGRATE
 if not dbs.get_value("migrated"):
     print("Migrating data. This may take a while...")
+    dbs.set_value(dbs.COUNTRY_DEFAULT, "DE")
+    dbs.set_value(dbs.COUNTRIES_MODEL, "DE")
+
     if os.path.exists("captured/data.txt") and os.path.exists("captured/sequence.txt"):
         import migrate
         migrate.migrate()

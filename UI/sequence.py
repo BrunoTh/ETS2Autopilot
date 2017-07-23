@@ -81,6 +81,9 @@ class SequenceUI(object):
 
     def delete_selection(self):
         img_id = self._get_selected_image()
+        if not img_id:
+            return
+
         filename = Data().get_image_data(img_id)[1]
         Data().delete_image(filename)
         if os.path.exists(os.path.join("captured", filename)):

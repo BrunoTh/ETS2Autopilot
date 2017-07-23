@@ -196,7 +196,7 @@ class Data(object):
 
     def get_next_fileid(self):
         result = self.db.execute("SELECT filename FROM image ORDER BY id DESC LIMIT 1")
-        if result is None:
+        if result is None or len(result) == 0:
             return 0
         else:
             filename = result[0][0]

@@ -3,11 +3,6 @@ This autpilot is based on the project by Sully Chen: https://github.com/SullyChe
 ### Get started
 Please visit https://www.ets2autopilot.com/ for instructions.
 
-### 3. How to use
-1. collect as much data as you can by executing `start_recording.bat`
-2. train your autopilot with `start_training.bat`
-3. let the computer do the steering with `start_autopilot.bat`
-
 ### DEMOS
 
 - \#1 https://www.youtube.com/watch?v=UKqEOmF2N2Q

@@ -148,13 +148,12 @@ class MainUI(object):
         rb_recording = self.ui.mode_recording.isChecked()
         rb_training = self.ui.mode_training.isChecked()
 
-        # Start the controller thread if it is not running
-        if self.thread_controller is None:
-            self.thread_controller = ControllerThread()
-            self.thread_controller.start()
-        else:
-            if not self.thread_controller.is_running():
-                self.thread_controller.start()
+        # Start the controller thread
+        if self.thread_controller is not None:
+            self.thread_controller.stop()
+        self.thread_controller = None
+        self.thread_controller = ControllerThread()
+        self.thread_controller.start()
 
         # Start mode specific thread
         if rb_autopilot:
@@ -189,6 +188,8 @@ class MainUI(object):
         if rb_autopilot:
             self.thread_autopilot.stop()
             self.thread_autopilot = None
+            # Show recorded corrections
+            self.fill_sequence_list()
         elif rb_recording:
             self.thread_recording.stop()
             self.thread_recording = None

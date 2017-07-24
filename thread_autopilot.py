@@ -76,7 +76,7 @@ class AutopilotThread(threading.Thread):
             # Interrupt autopilot if manual steering was detected
             if abs(manual_steering_prev - axis) > 1000 and autopilot:
                 img_id = Data().get_next_fileid()
-                sequence_id = Data().add_sequence(note="correction")
+                sequence_id = Data().add_sequence(country=Settings().get_value(Settings.COUNTRY_DEFAULT), note="correction")
                 self.controller_thread.set_autopilot(False)
 
                 # TODO: Deactivate this feature in settings

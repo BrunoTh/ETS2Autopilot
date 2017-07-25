@@ -188,8 +188,6 @@ class MainUI(object):
         if rb_autopilot:
             self.thread_autopilot.stop()
             self.thread_autopilot = None
-            # Show recorded corrections
-            self.fill_sequence_list()
         elif rb_recording:
             self.thread_recording.stop()
             self.thread_recording = None
@@ -197,6 +195,9 @@ class MainUI(object):
             self.thread_training.stop()
             self.thread_training = None
 
+        # Show recorded corrections
+        self.fill_sequence_list()
+            
         self.ui.mode_autopilot.setEnabled(True)
         self.ui.mode_training.setEnabled(True)
         self.ui.mode_recording.setEnabled(True)

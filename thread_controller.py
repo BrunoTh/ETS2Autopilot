@@ -7,17 +7,16 @@ from database import Settings
 class ControllerThread(threading.Thread):
     print_lock = threading.Lock()
     running = True
+    autopilot = False
     angle = 0
 
     def __init__(self):
         threading.Thread.__init__(self, daemon=True)
         ControllerThread.running = True
+        ControllerThread.autopilot = False
         self.controller = Settings().get_value(Settings.CONTROLLER)
         self.vjoy = Settings().get_value(Settings.VJOY_DEVICE)
         self.axis = Settings().get_value(Settings.STEERING_AXIS)
-        self.running = True
-        self.autopilot = False
-        self.angle = 0
 
     def stop(self):
         with ControllerThread.print_lock:
@@ -35,7 +34,7 @@ class ControllerThread(threading.Thread):
 
         while ControllerThread.running:
             pygame.event.pump()
-            if not self.autopilot:
+            if not ControllerThread.autopilot:
                 angle = round((joystick.get_axis(self.axis) + 1) * 32768 / 2)
             else:
                 angle = ControllerThread.angle
@@ -46,7 +45,8 @@ class ControllerThread(threading.Thread):
         return self.running
 
     def set_autopilot(self, value):
-        self.autopilot = value
+        with ControllerThread.print_lock:
+            ControllerThread.autopilot = value
 
     def set_angle(self, value):
         with ControllerThread.print_lock:

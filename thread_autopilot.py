@@ -74,10 +74,11 @@ class AutopilotThread(threading.Thread):
             # Read the steering value of joystick
             axis = round((self.joystick.get_axis(self.steering_axis) + 1) * 32768 / 2)
             # Interrupt autopilot if manual steering was detected
-            if abs(manual_steering_prev - axis) > 1000 and autopilot:
+            if abs(manual_steering_prev - axis) > 500 and autopilot:
                 img_id = Data().get_next_fileid()
                 sequence_id = Data().add_sequence(country=Settings().get_value(Settings.COUNTRY_DEFAULT), note="correction")
                 self.controller_thread.set_autopilot(False)
+                self.statusbar.showMessage("Autopilot inactive")
 
                 # TODO: Deactivate this feature in settings
                 # TODO: Amount of images to save in settings

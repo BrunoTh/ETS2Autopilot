@@ -53,16 +53,14 @@ class DrivingData(object):
         self.ys = []
 
         # points to the end of the last batch
-        train_batch_pointer = 0
-        val_batch_pointer = 0
+        self.train_batch_pointer = 0
+        self.val_batch_pointer = 0
 
         # Get all images
         self.image_list = []
 
         for country in countries:
-            # TODO: remove workaround
-            self.image_list = self.data.get_image_list()
-            # self.image_list += self.data.get_image_list_filter(country=country, maneuver=0)
+            self.image_list += self.data.get_image_list_filter(country=country, maneuver=0)
 
         for image in self.image_list:
             self.steering_deg = float(image[2]) * scipy.pi / 180

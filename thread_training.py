@@ -30,7 +30,7 @@ class TrainingThread(threading.Thread):
 
         # print("Images:", self.driving_data.num_images)
 
-        sess = tf.InteractiveSession()
+        sess = tf.InteractiveSession(graph=model.g)
 
         L2NormConst = 0.001
 

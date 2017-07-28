@@ -38,7 +38,7 @@ class AutopilotThread(threading.Thread):
         self.joystick = pygame.joystick.Joystick(Settings().get_value(Settings.CONTROLLER))
         self.joystick.init()
 
-        self.sess = tf.InteractiveSession()
+        self.sess = tf.InteractiveSession(graph=model.g)
         saver = tf.train.Saver()
         saver.restore(self.sess, "save/model_%s.ckpt" % self.country_code)
 
@@ -137,3 +137,4 @@ class AutopilotThread(threading.Thread):
             # functions.set_image(dst.copy(), self.steering_wheel)
 
             functions.set_image(main.copy(), self.image_front)
+        self.controller_thread.set_autopilot(False)

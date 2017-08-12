@@ -58,9 +58,11 @@ class DrivingData(object):
 
         # Get all images
         self.image_list = []
+        # Workaround
+        self.image_list = self.data.get_image_list_filter(maneuver=0)
 
-        for country in countries:
-            self.image_list += self.data.get_image_list_filter(country=country, maneuver=0)
+        #for country in countries:
+        #    self.image_list += self.data.get_image_list_filter(country=country, maneuver=0)
 
         for image in self.image_list:
             self.steering_deg = float(image[2]) * scipy.pi / 180

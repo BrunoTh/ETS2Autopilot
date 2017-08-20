@@ -262,6 +262,7 @@ class Data(object):
 
     def delete_sequence(self, sid):
         images = self.get_image_list(sid)
+        self.db.execute("DELETE FROM image WHERE sequence=?", (sid,))
         self.db.execute("DELETE FROM sequence WHERE id=?", (sid,))
 
         # Remove all files

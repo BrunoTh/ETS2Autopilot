@@ -55,7 +55,7 @@ class RecordingThread(threading.Thread):
                 recording = not recording
 
                 if recording:  # started recording
-                    sequence_id = d.add_sequence(country=s.get_value(Settings.COUNTRY_DEFAULT))
+                    sequence_id = d.add_sequence()
                 else:  # stopped recording
                     self.fill_sequence_list()
 

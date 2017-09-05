@@ -231,12 +231,23 @@ class Data(object):
         Creates a new sequence in db
         :return: ID of new sequence
         """
+        try:
+            last_sequence = self.get_image_list()[-1]
+        except Exception:
+            last_sequence = None
+
         if not country:
-            if not self.settings.get_value("country"):
-                country = "NULL"
+            if last_sequence:
+                cid = last_sequence[2]
+            elif not self.settings.get_value(Settings.COUNTRY_DEFAULT):
+                country = "DE"
             else:
-                country = self.settings.get_value("country")
-        cid = self.get_country_id(country)
+                country = self.settings.get_value(Settings.COUNTRY_DEFAULT)
+        if country:
+            cid = self.get_country_id(country)
+
+        if road_type == -1 and last_sequence:
+            road_type = last_sequence[3]
 
         if timestamp:
             result = self.db.execute("INSERT INTO sequence (country, type, controller_type, note, timestamp) VALUES (?, ?, ?, ?, ?)", (cid, road_type, controller_type, note, str(timestamp),))

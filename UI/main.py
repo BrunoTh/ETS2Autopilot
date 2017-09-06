@@ -4,6 +4,7 @@ from PyQt5 import QtCore
 from UI.ui_main import Ui_MainWindow
 from UI.settings import SettingsUI
 from UI.sequence import SequenceUI
+from UI.updater import UpdaterUI
 from database import Settings, Data
 from thread_controller import ControllerThread
 from thread_autopilot import AutopilotThread
@@ -21,6 +22,7 @@ class MainUI(object):
         # Register other windows
         self.settings_ui = SettingsUI()
         self.sequence_ui = SequenceUI()
+        self.updater_ui = UpdaterUI()
 
         # Define thread variables
         self.thread_controller = None
@@ -31,6 +33,7 @@ class MainUI(object):
         # Register buttons and stuff
         self.ui.actionSettings.triggered.connect(self.settings_ui.show)
         self.ui.actionExit.triggered.connect(sys.exit)
+        self.ui.actionUpdater.triggered.connect(self.updater_ui.show)
         self.ui.actionAbout.triggered.connect(self.show_info)
 
         self.ui.b_sequenceApply.clicked.connect(self.append_sequence_changes)

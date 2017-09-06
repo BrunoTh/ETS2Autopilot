@@ -244,7 +244,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>60</y>
+       <y>90</y>
        <width>111</width>
        <height>25</height>
       </rect>
@@ -257,7 +257,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>90</y>
+       <y>60</y>
        <width>111</width>
        <height>25</height>
       </rect>
@@ -287,7 +287,7 @@
      <x>0</x>
      <y>0</y>
      <width>855</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -301,6 +301,7 @@
     <property name="title">
      <string>Info</string>
     </property>
+    <addaction name="actionUpdater"/>
     <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuFile"/>
@@ -339,6 +340,11 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionUpdater">
+   <property name="text">
+    <string>Updater</string>
    </property>
   </action>
  </widget>

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main.ui'
+# Form implementation generated from reading ui file 'designer\main.ui'
 #
-# Created by: PyQt5 UI code generator 5.8
+# Created by: PyQt5 UI code generator 5.9
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -73,17 +73,17 @@ class Ui_MainWindow(object):
         self.mode_recording.setChecked(True)
         self.mode_recording.setObjectName("mode_recording")
         self.mode_autopilot = QtWidgets.QRadioButton(self.gb_modes)
-        self.mode_autopilot.setGeometry(QtCore.QRect(10, 60, 111, 25))
+        self.mode_autopilot.setGeometry(QtCore.QRect(10, 90, 111, 25))
         self.mode_autopilot.setObjectName("mode_autopilot")
         self.mode_training = QtWidgets.QRadioButton(self.gb_modes)
-        self.mode_training.setGeometry(QtCore.QRect(10, 90, 111, 25))
+        self.mode_training.setGeometry(QtCore.QRect(10, 60, 111, 25))
         self.mode_training.setObjectName("mode_training")
         self.b_mode = QtWidgets.QPushButton(self.gb_modes)
         self.b_mode.setGeometry(QtCore.QRect(10, 130, 95, 30))
         self.b_mode.setObjectName("b_mode")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 855, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 855, 21))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -103,8 +103,11 @@ class Ui_MainWindow(object):
         self.actionExit.setObjectName("actionExit")
         self.actionAbout = QtWidgets.QAction(MainWindow)
         self.actionAbout.setObjectName("actionAbout")
+        self.actionUpdater = QtWidgets.QAction(MainWindow)
+        self.actionUpdater.setObjectName("actionUpdater")
         self.menuFile.addAction(self.actionSettings)
         self.menuFile.addAction(self.actionExit)
+        self.menuInfo.addAction(self.actionUpdater)
         self.menuInfo.addAction(self.actionAbout)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuInfo.menuAction())
@@ -134,4 +137,5 @@ class Ui_MainWindow(object):
         self.actionSettings.setText(_translate("MainWindow", "Settings"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))
         self.actionAbout.setText(_translate("MainWindow", "About"))
+        self.actionUpdater.setText(_translate("MainWindow", "Updater"))
 

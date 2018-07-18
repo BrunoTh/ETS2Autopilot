@@ -6,7 +6,7 @@ from UI.settings import SettingsUI
 from UI.sequence import SequenceUI
 from database import Settings, Data
 from thread_controller import ControllerThread
-from thread_autopilot import AutopilotThread
+from thread_autopilot_cv import AutopilotThread  # Using cv mode
 from thread_recording import RecordingThread
 from thread_training import TrainingThread
 import sys

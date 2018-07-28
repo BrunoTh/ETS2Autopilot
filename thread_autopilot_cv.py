@@ -13,76 +13,6 @@ import functions
 import os
 
 
-# BEGIN USING CODE FROM Naoki Shibuya (https://github.com/naokishibuya/car-finding-lane-lines)
-def average_slope_intercept(lines):
-    left_lines = []  # (slope, intercept)
-    left_weights = []  # (length,)
-    right_lines = []  # (slope, intercept)
-    right_weights = []  # (length,)
-
-    for line in lines:
-        for x1, y1, x2, y2 in line:
-            if x2 == x1:
-                continue  # ignore a vertical line
-            slope = (y2 - y1) / (x2 - x1)
-            intercept = y1 - slope * x1
-            length = np.sqrt((y2 - y1) ** 2 + (x2 - x1) ** 2)
-            if slope < 0:  # y is reversed in image
-                left_lines.append((slope, intercept))
-                left_weights.append((length))
-            else:
-                right_lines.append((slope, intercept))
-                right_weights.append((length))
-
-    # add more weight to longer lines
-    left_lane = np.dot(left_weights, left_lines) / np.sum(left_weights) if len(left_weights) > 0 else None
-    right_lane = np.dot(right_weights, right_lines) / np.sum(right_weights) if len(right_weights) > 0 else None
-
-    return left_lane, right_lane  # (slope, intercept), (slope, intercept)
-
-
-def make_line_points(y1, y2, line):
-    """
-    Convert a line represented in slope and intercept into pixel points
-    """
-    if line is None:
-        return None
-
-    slope, intercept = line
-
-    # make sure everything is integer as cv2.line requires it
-    x1 = int((y1 - intercept) / slope)
-    x2 = int((y2 - intercept) / slope)
-    y1 = int(y1)
-    y2 = int(y2)
-
-    return ((x1, y1), (x2, y2))
-
-
-def lane_lines(image, lines):
-    left_lane, right_lane = average_slope_intercept(lines)
-
-    y1 = image.shape[0]  # bottom of the image
-    y2 = y1 * 0.6  # slightly lower than the middle
-
-    left_line = make_line_points(y1, y2, left_lane)
-    right_line = make_line_points(y1, y2, right_lane)
-
-    return left_line, right_line
-
-
-def draw_lane_lines(image, lines, color=[255, 0, 0], thickness=20):
-    # make a separate image to draw lines and combine with the orignal later
-    line_image = np.zeros_like(image)
-    for line in lines:
-        if line is not None:
-            cv2.line(line_image, *line, color, thickness)
-    # image1 * α + image2 * β + λ
-    # image1 and image2 must be the same shape.
-    return cv2.addWeighted(image, 1.0, line_image, 0.95, 0.0)
-# END USING CODE FROM Naoki Shibuya (https://github.com/naokishibuya/car-finding-lane-lines)
-
-
 class AutopilotThread(threading.Thread):
     lock = threading.Lock()
     running = True
@@ -166,27 +96,7 @@ class AutopilotThread(threading.Thread):
             image = scipy.misc.imresize(main, [66, 200]) / 255.0
 
             # Detect lane and steer
-            # BEGIN USING CODE FROM Naoki Shibuya (https://github.com/naokishibuya/car-finding-lane-lines)
-            lane_hls = cv2.cvtColor(main, cv2.COLOR_RGB2HLS)
-            # lane_hls = main.copy()
-            # White color mask
-            lower = np.uint8([0, 200, 0])
-            upper = np.uint8([255, 255, 255])
-            lane_white_mask = cv2.inRange(lane_hls, lower, upper)
-            lane_white = cv2.bitwise_and(main, main, mask=lane_white_mask)
-
-            lane_gray = cv2.cvtColor(lane_white, cv2.COLOR_RGB2GRAY)
-            lane_gauss = cv2.GaussianBlur(lane_gray, (15, 15), 0)
-            lane_canny = cv2.Canny(lane_gauss, 50, 150)
-            # TODO: find region of interest
-            lane_roi = lane_canny
-            lane_hough_lines = cv2.HoughLinesP(lane_roi, rho=1, theta=np.pi/180, threshold=20, minLineLength=20,
-                                               maxLineGap=300)
-            if lane_hough_lines is not None and len(lane_hough_lines) > 0:
-                lane_final_image = draw_lane_lines(main, lane_lines(main, lane_hough_lines))
-            else:
-                lane_final_image = main.copy()
-            # END USING CODE FROM Naoki Shibuya
+            lane_final_image = main.copy()
 
             # TODO: Determine center of lane and calculate degrees to reach this center.
             # y_eval = model.y.eval(session=self.sess, feed_dict={model.x: [image], model.keep_prob: 1.0})[0][0]

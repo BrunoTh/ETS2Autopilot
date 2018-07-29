@@ -13,6 +13,32 @@ import functions
 import os
 
 
+def get_perspective_transform_matrix(img, bottom_width, top_width, height, offset, to_shape):
+    shape = img.shape
+
+    bottom_y = shape[0] - offset
+    top_y = bottom_y - round(shape[0] * height)
+
+    x_middle = round(shape[1]/2)
+    bottom_x_half = round(shape[1] * bottom_width / 2)
+    top_x_half = round(shape[1] * top_width / 2)
+
+    src_points = np.float32([
+        [x_middle - top_x_half, top_y],  # A - Top Left
+        [x_middle + top_x_half, top_y],  # B - Top Right
+        [x_middle + bottom_x_half, bottom_y],  # C - Bottom Right
+        [x_middle - bottom_x_half, bottom_y],  # D - Bottom Left
+    ])
+    dst_points = np.float32([
+        [0, 0],
+        [to_shape[1], 0],
+        to_shape,
+        [0, to_shape[0]],
+    ])
+
+    return cv2.getPerspectiveTransform(src_points, dst_points), cv2.getPerspectiveTransform(dst_points, src_points)
+
+
 class AutopilotThread(threading.Thread):
     lock = threading.Lock()
     running = True
@@ -96,7 +122,24 @@ class AutopilotThread(threading.Thread):
             image = scipy.misc.imresize(main, [66, 200]) / 255.0
 
             # Detect lane and steer
-            lane_final_image = main.copy()
+            M, Minv = get_perspective_transform_matrix(main, 1, 0.2, 0.4, 0, [300, 300])
+            image_warped = cv2.warpPerspective(main.copy(), M, (300, 300), flags=cv2.INTER_LINEAR)
+            # image_transformed = cv2.warpPerspective(image_transformed.copy(), Minv, image_transformed.shape[:2][::-1],
+            #                                        flags=cv2.INTER_LINEAR)
+
+            lower_white = np.array([180, 180, 180])
+            upper_white = np.array([255, 255, 255])
+            mask = cv2.inRange(image_warped, lower_white, upper_white)
+            image_warped_filtered = cv2.bitwise_and(image_warped, image_warped, mask=mask)
+            _, image_warped_filtered_binary = cv2.threshold(image_warped_filtered, 127, 255, cv2.THRESH_BINARY)
+
+            histogram = list()
+            for column_counter in range(image_warped_filtered_binary.shape[1]):
+                column = image_warped_filtered_binary[:, column_counter]
+                histogram.append(np.count_nonzero(column))
+            print(histogram.index(max(histogram[:150])), histogram.index(max(histogram[150:])))
+
+            lane_final_image = image_warped_filtered_binary.copy()
 
             # TODO: Determine center of lane and calculate degrees to reach this center.
             # y_eval = model.y.eval(session=self.sess, feed_dict={model.x: [image], model.keep_prob: 1.0})[0][0]
@@ -117,5 +160,4 @@ class AutopilotThread(threading.Thread):
             # functions.set_image(dst.copy(), self.steering_wheel)
 
             # functions.set_image(main.copy(), self.image_front)
-            cv2.imshow('canny', lane_canny)
             functions.set_image(lane_final_image.copy(), self.image_front)

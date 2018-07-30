@@ -64,13 +64,19 @@ def get_content_of_sliding_window(image, abs_center, width, height, count=0):
 
 
 def get_centered_sliding_window(image, abs_center, width, height, count=0):
-    """Returns a width x height window with corrected center."""
+    """Returns a width x height window with corrected center and the value of the center in the whole image."""
     window = get_content_of_sliding_window(image, abs_center, width, height, count)
+
+    if not window:
+        return None
+
     histogram = generate_column_historgram(window)
+    # TODO: check if line is in the window
     window_center = histogram.index(max(histogram))
+    # TODO: use mean instead of ma
     new_abs_center = abs_center - round(width/2) - window_center
     new_window = get_content_of_sliding_window(image, new_abs_center, width, height, count)
-    return new_window
+    return new_window, new_abs_center
 
 
 class AutopilotThread(threading.Thread):

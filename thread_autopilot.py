@@ -38,7 +38,7 @@ class AutopilotThread(threading.Thread):
         self.joystick = pygame.joystick.Joystick(Settings().get_value(Settings.CONTROLLER))
         self.joystick.init()
 
-        self.sess = tf.InteractiveSession()
+        self.sess = tf.InteractiveSession(graph=model.g)
         saver = tf.train.Saver()
         saver.restore(self.sess, "save/model_%s.ckpt" % self.country_code)
 
@@ -74,10 +74,11 @@ class AutopilotThread(threading.Thread):
             # Read the steering value of joystick
             axis = round((self.joystick.get_axis(self.steering_axis) + 1) * 32768 / 2)
             # Interrupt autopilot if manual steering was detected
-            if abs(manual_steering_prev - axis) > 1000 and autopilot:
+            if abs(manual_steering_prev - axis) > 500 and autopilot:
                 img_id = Data().get_next_fileid()
-                sequence_id = Data().add_sequence(country=Settings().get_value(Settings.COUNTRY_DEFAULT), note="correction")
+                sequence_id = Data().add_sequence(note="correction")
                 self.controller_thread.set_autopilot(False)
+                self.statusbar.showMessage("Autopilot inactive")
 
                 # TODO: Deactivate this feature in settings
                 # TODO: Amount of images to save in settings
@@ -136,3 +137,4 @@ class AutopilotThread(threading.Thread):
             # functions.set_image(dst.copy(), self.steering_wheel)
 
             functions.set_image(main.copy(), self.image_front)
+        self.controller_thread.set_autopilot(False)

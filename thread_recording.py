@@ -34,7 +34,7 @@ class RecordingThread(threading.Thread):
 
     def run(self):
         s = Settings()
-        d = Data()
+        d = Data(batch=True)
 
         img_id = d.get_next_fileid()
         recording = False
@@ -55,7 +55,7 @@ class RecordingThread(threading.Thread):
                 recording = not recording
 
                 if recording:  # started recording
-                    sequence_id = d.add_sequence(country=s.get_value(Settings.COUNTRY_DEFAULT))
+                    sequence_id = d.add_sequence()
                 else:  # stopped recording
                     self.fill_sequence_list()
 
@@ -122,3 +122,4 @@ class RecordingThread(threading.Thread):
                 cv2.imwrite("captured/%d.png" % img_id, resized)
                 d.add_image("%d.png" % img_id, axis, speed, throttle, maneuver, sequence_id)
                 img_id += 1
+        d.append()

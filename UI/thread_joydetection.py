@@ -27,7 +27,14 @@ class DetectorThread(threading.Thread):
         joystick.init()
         num_buttons = joystick.get_numbuttons()
         num_axes = joystick.get_numaxes()
+        
+        # Get default values of axes
+        pygame.event.pump()
+        axes_default = [0] * num_axes
 
+        for i in range(num_axes):
+            axes_default[i] = joystick.get_axis(i)
+        
         while DetectorThread.running:
             pygame.event.pump()
 
@@ -37,6 +44,6 @@ class DetectorThread(threading.Thread):
                     self.stop()
 
             for i in range(num_axes):
-                if abs(joystick.get_axis(i)) > 0.3:
+                if abs(joystick.get_axis(i) - axes_default[i]) > 0.3:
                     self.field.setText(str(i))
                     self.stop()

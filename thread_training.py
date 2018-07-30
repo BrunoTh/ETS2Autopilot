@@ -30,7 +30,7 @@ class TrainingThread(threading.Thread):
 
         # print("Images:", self.driving_data.num_images)
 
-        sess = tf.InteractiveSession()
+        sess = tf.InteractiveSession(graph=model.g)
 
         L2NormConst = 0.001
 
@@ -67,7 +67,7 @@ class TrainingThread(threading.Thread):
                 if i % 10 == 0:
                     xs, ys = self.driving_data.LoadValBatch(batch_size)
                     loss_value = loss.eval(feed_dict={model.x: xs, model.y_: ys, model.keep_prob: 1.0})
-                    self.statusbar.showMessage("Epoch: %d, Step: %d, Loss: %g" % (epoch, epoch * batch_size + i, loss_value))
+                    self.statusbar.showMessage("Epoch: %d, Step: %d, Loss: %g" % (epoch, i, loss_value))
                     #print("Epoch: %d, Step: %d, Loss: %g" % (epoch, epoch * batch_size + i, loss_value))
 
                 # write logs at every iteration

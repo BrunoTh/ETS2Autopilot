@@ -165,7 +165,7 @@ class AutopilotThread(threading.Thread):
             upper_white = np.array([255, 255, 255])
             mask = cv2.inRange(image_warped, lower_white, upper_white)
             image_warped_filtered = cv2.bitwise_and(image_warped, image_warped, mask=mask)
-            _, image_warped_filtered_binary = cv2.threshold(image_warped_filtered, 127, 255, cv2.THRESH_BINARY)
+            _, image_warped_filtered_binary = cv2.threshold(image_warped_filtered, 1, 255, cv2.THRESH_BINARY)
 
             histogram = generate_column_historgram(image_warped_filtered_binary)
             print(histogram.index(max(histogram[:150])), histogram.index(max(histogram[150:])))

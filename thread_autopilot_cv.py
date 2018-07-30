@@ -39,6 +39,40 @@ def get_perspective_transform_matrix(img, bottom_width, top_width, height, offse
     return cv2.getPerspectiveTransform(src_points, dst_points), cv2.getPerspectiveTransform(dst_points, src_points)
 
 
+def generate_column_historgram(image):
+    """Returns a list where each value represents the amount of nonzero pixels."""
+    histogram = list()
+    for column_counter in range(image.shape[1]):
+        column = image[:, column_counter]
+        histogram.append(np.count_nonzero(column))
+    return histogram
+
+
+def get_content_of_sliding_window(image, abs_center, width, height, count=0):
+    """Returns a width x height window where abs_center is the center."""
+    y_bottom = image.shape[0] + height*count
+    y_top = y_bottom + height
+
+    if y_top > image.shape[0]:
+        return None
+
+    x_left = abs_center - round(width/2)
+    x_right = abs_center + round(width/2)
+    window = image[y_top:y_bottom, x_left:x_right]
+
+    return window
+
+
+def get_centered_sliding_window(image, abs_center, width, height, count=0):
+    """Returns a width x height window with corrected center."""
+    window = get_content_of_sliding_window(image, abs_center, width, height, count)
+    histogram = generate_column_historgram(window)
+    window_center = histogram.index(max(histogram))
+    new_abs_center = abs_center - round(width/2) - window_center
+    new_window = get_content_of_sliding_window(image, new_abs_center, width, height, count)
+    return new_window
+
+
 class AutopilotThread(threading.Thread):
     lock = threading.Lock()
     running = True
@@ -133,10 +167,7 @@ class AutopilotThread(threading.Thread):
             image_warped_filtered = cv2.bitwise_and(image_warped, image_warped, mask=mask)
             _, image_warped_filtered_binary = cv2.threshold(image_warped_filtered, 127, 255, cv2.THRESH_BINARY)
 
-            histogram = list()
-            for column_counter in range(image_warped_filtered_binary.shape[1]):
-                column = image_warped_filtered_binary[:, column_counter]
-                histogram.append(np.count_nonzero(column))
+            histogram = generate_column_historgram(image_warped_filtered_binary)
             print(histogram.index(max(histogram[:150])), histogram.index(max(histogram[150:])))
 
             lane_final_image = image_warped_filtered_binary.copy()

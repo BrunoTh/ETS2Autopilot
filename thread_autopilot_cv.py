@@ -161,20 +161,47 @@ class AutopilotThread(threading.Thread):
             # Resize the image to the size of the neural network input layer
             image = scipy.misc.imresize(main, [66, 200]) / 255.0
 
-            # Detect lane and steer
+            ### Detect lane and steer ###
+            # Do a perspective transformation of the lane.
             M, Minv = get_perspective_transform_matrix(main, 1, 0.2, 0.4, 0, [300, 300])
             image_warped = cv2.warpPerspective(main.copy(), M, (300, 300), flags=cv2.INTER_LINEAR)
-            # image_transformed = cv2.warpPerspective(image_transformed.copy(), Minv, image_transformed.shape[:2][::-1],
-            #                                        flags=cv2.INTER_LINEAR)
 
+            # Filter lane markings.
             lower_white = np.array([180, 180, 180])
             upper_white = np.array([255, 255, 255])
             mask = cv2.inRange(image_warped, lower_white, upper_white)
             image_warped_filtered = cv2.bitwise_and(image_warped, image_warped, mask=mask)
             _, image_warped_filtered_binary = cv2.threshold(image_warped_filtered, 1, 255, cv2.THRESH_BINARY)
 
+            # Find position of left and right markings.
             histogram = generate_column_historgram(image_warped_filtered_binary)
-            print(histogram.index(max(histogram[:150])), histogram.index(max(histogram[150:])))
+            left_markings = histogram.index(max(histogram[:150]))
+            right_markings = histogram.index(max(histogram[150:]))
+
+            if left_markings > 0 and right_markings > 0:
+                # Apply sliding window technique.
+                window_width = 50
+                window_height = 25
+                window_count = int(image_warped_filtered_binary.shape[0]/window_height)
+
+                left_centers = [left_markings]
+                right_centers = [right_markings]
+
+                for count in range(window_count):
+                    _, corrected_center_left = get_centered_sliding_window(image_warped_filtered_binary,
+                                                                           left_centers[count], window_width,
+                                                                           window_height, count)
+                    _, corrected_center_right = get_centered_sliding_window(image_warped_filtered_binary,
+                                                                            right_centers[count], window_width,
+                                                                            window_height, count)
+                    if count == 0:
+                        left_centers = []
+                        right_centers = []
+
+                    left_centers.append(corrected_center_left)
+                    right_centers.append(corrected_center_right)
+
+                print(left_centers, right_centers)
 
             lane_final_image = image_warped_filtered_binary.copy()
 

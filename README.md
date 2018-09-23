@@ -1,5 +1,3 @@
-This autpilot is based on the project by Sully Chen: https://github.com/SullyChen/Autopilot-TensorFlow
-
 ### Get started
 Please visit https://www.ets2autopilot.com/ for instructions.
 

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'designer\settings.ui'
 #
-# Created by: PyQt5 UI code generator 5.9
+# Created by: PyQt5 UI code generator 5.9.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -111,17 +111,17 @@ class Ui_MainWindow(object):
         self.label_12.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_12.setObjectName("label_12")
         self.label_13 = QtWidgets.QLabel(self.gb_joystick)
-        self.label_13.setEnabled(False)
+        self.label_13.setEnabled(True)
         self.label_13.setGeometry(QtCore.QRect(409, 22, 66, 20))
         self.label_13.setObjectName("label_13")
         self.rb_gamepad = QtWidgets.QRadioButton(self.gb_joystick)
-        self.rb_gamepad.setEnabled(False)
+        self.rb_gamepad.setEnabled(True)
         self.rb_gamepad.setGeometry(QtCore.QRect(450, 20, 111, 25))
         self.rb_gamepad.setCheckable(True)
         self.rb_gamepad.setChecked(True)
         self.rb_gamepad.setObjectName("rb_gamepad")
         self.rb_wheel = QtWidgets.QRadioButton(self.gb_joystick)
-        self.rb_wheel.setEnabled(False)
+        self.rb_wheel.setEnabled(True)
         self.rb_wheel.setGeometry(QtCore.QRect(450, 50, 131, 25))
         self.rb_wheel.setObjectName("rb_wheel")
         self.label_14 = QtWidgets.QLabel(self.gb_joystick)

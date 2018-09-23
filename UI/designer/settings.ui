@@ -381,7 +381,7 @@
    </widget>
    <widget class="QLabel" name="label_13">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -397,7 +397,7 @@
    </widget>
    <widget class="QRadioButton" name="rb_gamepad">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -419,7 +419,7 @@
    </widget>
    <widget class="QRadioButton" name="rb_wheel">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>

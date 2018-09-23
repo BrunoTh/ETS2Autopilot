@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>855</width>
-    <height>523</height>
+    <width>542</width>
+    <height>255</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
    <widget class="QLabel" name="image_front">
     <property name="geometry">
      <rect>
-      <x>490</x>
+      <x>170</x>
       <y>10</y>
       <width>360</width>
       <height>200</height>
@@ -51,234 +51,31 @@
      <string/>
     </property>
    </widget>
-   <widget class="QListView" name="sequence_list">
+   <widget class="QPushButton" name="b_autopilot">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>151</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Start Autopilot</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="b_ets2_vjoy">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>200</width>
-      <height>241</height>
-     </rect>
-    </property>
-    <property name="minimumSize">
-     <size>
-      <width>200</width>
-      <height>200</height>
-     </size>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>16777215</width>
-      <height>300</height>
-     </size>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="e_country">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>30</y>
-      <width>110</width>
-      <height>32</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>10</y>
-      <width>66</width>
-      <height>20</height>
+      <width>151</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Country:</string>
+     <string>Start Joystick detection</string>
     </property>
-   </widget>
-   <widget class="QComboBox" name="cb_roadtype">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>90</y>
-      <width>110</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <item>
-     <property name="text">
-      <string>Not set</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Freeway</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Highway</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>City</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>70</y>
-      <width>71</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Road type:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="steering_wheel">
-    <property name="geometry">
-     <rect>
-      <x>380</x>
-      <y>110</y>
-      <width>100</width>
-      <height>100</height>
-     </rect>
-    </property>
-    <property name="minimumSize">
-     <size>
-      <width>100</width>
-      <height>100</height>
-     </size>
-    </property>
-    <property name="mouseTracking">
-     <bool>false</bool>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::Box</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Sunken</enum>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="b_sequenceApply">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>130</y>
-      <width>110</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Apply</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="b_sequenceDelete">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>260</y>
-      <width>95</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Delete</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="b_sequenceDetails">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>260</y>
-      <width>95</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Details</string>
-    </property>
-   </widget>
-   <widget class="QGroupBox" name="gb_modes">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>300</y>
-      <width>111</width>
-      <height>171</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Mode</string>
-    </property>
-    <property name="flat">
-     <bool>false</bool>
-    </property>
-    <property name="checkable">
-     <bool>false</bool>
-    </property>
-    <widget class="QRadioButton" name="mode_recording">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>111</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Recording</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QRadioButton" name="mode_autopilot">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>90</y>
-       <width>111</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Autopilot</string>
-     </property>
-    </widget>
-    <widget class="QRadioButton" name="mode_training">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>111</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Training</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="b_mode">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>130</y>
-       <width>95</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Start</string>
-     </property>
-    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -286,7 +83,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>855</width>
+     <width>542</width>
      <height>21</height>
     </rect>
    </property>

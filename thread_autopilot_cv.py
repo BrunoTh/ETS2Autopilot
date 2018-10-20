@@ -9,6 +9,10 @@ import time
 from database import Settings
 import functions
 import os
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger(__name__)
 
 
 def get_perspective_transform_matrix(img, bottom_width, top_width, height, offset, to_shape):
@@ -37,7 +41,7 @@ def get_perspective_transform_matrix(img, bottom_width, top_width, height, offse
     return cv2.getPerspectiveTransform(src_points, dst_points), cv2.getPerspectiveTransform(dst_points, src_points)
 
 
-def generate_column_historgram(image):
+def generate_column_histogram(image):
     """Returns a list where each value represents the amount of nonzero pixels."""
     histogram = list()
     for column_counter in range(image.shape[1]):
@@ -48,10 +52,10 @@ def generate_column_historgram(image):
 
 def get_content_of_sliding_window(image, abs_center, width, height, count=0):
     """Returns a width x height window where abs_center is the center."""
-    y_bottom = image.shape[0] + height*count
-    y_top = y_bottom + height
+    y_bottom = image.shape[0] - height*count
+    y_top = y_bottom - height
 
-    if y_top > image.shape[0]:
+    if y_top < 0:
         return None
 
     x_left = abs_center - round(width/2)
@@ -63,18 +67,21 @@ def get_content_of_sliding_window(image, abs_center, width, height, count=0):
 
 def get_centered_sliding_window(image, abs_center, width, height, count=0):
     """Returns a width x height window with corrected center and the value of the center in the whole image."""
+    if not abs_center:
+        return None, 0, 0
+
     window = get_content_of_sliding_window(image, abs_center, width, height, count)
 
-    if not window:
-        return None
+    if not window.any():
+        return None, 0, 0
 
-    histogram = generate_column_historgram(window)
+    histogram = generate_column_histogram(window)
     # TODO: check if line is in the window
     window_center = histogram.index(max(histogram))
     # TODO: use mean instead of ma
     new_abs_center = abs_center - round(width/2) - window_center
     new_window = get_content_of_sliding_window(image, new_abs_center, width, height, count)
-    return new_window, new_abs_center
+    return new_window, new_abs_center, max(histogram)
 
 
 class AutopilotThread(threading.Thread):
@@ -114,9 +121,6 @@ class AutopilotThread(threading.Thread):
         autopilot_button_prev = 0
         # Previous value of steering (gamepad)
         manual_steering_prev = 0
-
-        img_wheel = cv2.imread('steering_wheel_image.jpg', 0)
-        rows, cols = img_wheel.shape
 
         while AutopilotThread.running:
             pygame.event.pump()
@@ -164,37 +168,85 @@ class AutopilotThread(threading.Thread):
             image_warped_filtered = cv2.bitwise_and(image_warped, image_warped, mask=mask)
             _, image_warped_filtered_binary = cv2.threshold(image_warped_filtered, 1, 255, cv2.THRESH_BINARY)
 
-            # Find position of left and right markings.
-            histogram = generate_column_historgram(image_warped_filtered_binary)
-            left_markings = histogram.index(max(histogram[:150]))
-            right_markings = histogram.index(max(histogram[150:]))
+            # # Find position of left and right markings.
+            # histogram = generate_column_histogram(image_warped_filtered_binary)
+            # left_markings = histogram.index(max(histogram[:150]))
+            # right_markings = histogram.index(max(histogram[150:]))
+            # log.debug((left_markings, right_markings))
+
+            window_width = 75
+            window_height = 50
+
+            # First half (left markings)
+            column_count = int(image_warped_filtered_binary.shape[1]/window_width)
+            left_prediction = []
+            right_prediction = []
+
+            for column in range(0, int(column_count/2)):
+                left_predicted_center = int(window_width/2 + column*window_width)
+                left_prediction.append(get_centered_sliding_window(image_warped_filtered_binary,
+                                                                   left_predicted_center,
+                                                                   window_width, window_height))
+
+                right_predicted_center = int(window_width / 2 + (column + column_count/2) * window_width)
+                right_prediction.append(get_centered_sliding_window(image_warped_filtered_binary,
+                                                                    right_predicted_center,
+                                                                    window_width, window_height))
+
+            # Select the sector with the highest maximum.
+            left_markings_histogram_max = [x[2] for x in left_prediction]
+            left_markings_center = [x[1] for x in left_prediction]
+            left_markings = left_markings_center[left_markings_histogram_max.index(max(left_markings_histogram_max))]
+
+            right_markings_histogram_max = [x[2] for x in right_prediction]
+            right_markings_center = [x[1] for x in right_prediction]
+            right_markings = right_markings_center[right_markings_histogram_max.index(max(right_markings_histogram_max))]
+
+            log.debug(('LEFT', left_markings_center, left_markings_histogram_max))
+            log.debug(('RIGHT', right_markings_center, right_markings_histogram_max))
+            log.debug(('CHOSE', left_markings, right_markings))
+
+            left_centers = [None]
+            right_centers = [None]
 
             if left_markings > 0 and right_markings > 0:
                 # Apply sliding window technique.
-                window_width = 50
-                window_height = 25
                 window_count = int(image_warped_filtered_binary.shape[0]/window_height)
 
                 left_centers = [left_markings]
                 right_centers = [right_markings]
 
-                for count in range(window_count):
-                    _, corrected_center_left = get_centered_sliding_window(image_warped_filtered_binary,
-                                                                           left_centers[count], window_width,
-                                                                           window_height, count)
-                    _, corrected_center_right = get_centered_sliding_window(image_warped_filtered_binary,
-                                                                            right_centers[count], window_width,
-                                                                            window_height, count)
-                    if count == 0:
+                # Go through all rows (from bottom to top of the image).
+                for row in range(1, window_count):
+                    if row > 0:
+                        last_value = row-1
+                    else:
+                        last_value = 0
+
+                    # Take the center (global position) of the last row and use it as entry point.
+                    # Then look window_width/2 to the left and to the right and determine the more precise
+                    # center in that area.
+                    _, corrected_center_left, _ = get_centered_sliding_window(image_warped_filtered_binary,
+                                                                              left_centers[last_value], window_width,
+                                                                              window_height, row)
+                    _, corrected_center_right, _ = get_centered_sliding_window(image_warped_filtered_binary,
+                                                                               right_centers[last_value], window_width,
+                                                                               window_height, row)
+                    if row == 0:
                         left_centers = []
                         right_centers = []
 
                     left_centers.append(corrected_center_left)
                     right_centers.append(corrected_center_right)
 
-                print(left_centers, right_centers)
+                log.debug(('LEFT_CENTERS', left_centers))
+                log.debug(('RIGHT_CENTERS', right_centers))
 
             lane_final_image = image_warped_filtered_binary.copy()
+            if left_centers[0]:
+                lane_final_image = cv2.line(lane_final_image, (left_centers[0], 0), (left_centers[0], 300), (255, 0, 0), 5)
+            if right_centers[0]:
+                lane_final_image = cv2.line(lane_final_image, (right_centers[0], 0), (right_centers[0], 300), (0, 255, 0), 5)
 
             # TODO: Determine center of lane and calculate degrees to reach this center.
             y_eval = 0
@@ -207,10 +259,6 @@ class AutopilotThread(threading.Thread):
                 self.statusbar.showMessage("Autopilot active")
             else:
                 self.statusbar.showMessage("Autopilot inactive")
-
-            # TODO: Show steering wheel in GUI
-            M = cv2.getRotationMatrix2D((cols / 2, rows / 2), -degrees, 1)
-            dst = cv2.warpAffine(img_wheel, M, (cols, rows))
 
             # functions.set_image(main.copy(), self.image_front)
             functions.set_image(lane_final_image.copy(), self.image_front)

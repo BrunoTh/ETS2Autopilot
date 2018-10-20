@@ -101,10 +101,6 @@ class AutopilotThread(threading.Thread):
         self.joystick = pygame.joystick.Joystick(Settings().get_value(Settings.CONTROLLER))
         self.joystick.init()
 
-        # self.sess = tf.InteractiveSession()
-        # saver = tf.train.Saver()
-        # saver.restore(self.sess, "save/model_%s.ckpt" % self.country_code)
-
     def stop(self):
         with AutopilotThread.lock:
             AutopilotThread.running = False
@@ -130,7 +126,7 @@ class AutopilotThread(threading.Thread):
             # Button was pressed
             if autopilot_button_act != autopilot_button_prev and autopilot_button_act == 1:
                 autopilot = not autopilot
-                #if autopilot and settings.AUTOPILOT_SOUND_ACTIVATE:
+                # if autopilot and settings.AUTOPILOT_SOUND_ACTIVATE:
                 #    autopilot_engage.play()
             autopilot_button_prev = autopilot_button_act
 
@@ -201,7 +197,6 @@ class AutopilotThread(threading.Thread):
             lane_final_image = image_warped_filtered_binary.copy()
 
             # TODO: Determine center of lane and calculate degrees to reach this center.
-            # y_eval = model.y.eval(session=self.sess, feed_dict={model.x: [image], model.keep_prob: 1.0})[0][0]
             y_eval = 0
             degrees = y_eval * 180 / scipy.pi
             steering = int(round((degrees + 180) / 180 * 32768 / 2))  # Value for vjoy controller

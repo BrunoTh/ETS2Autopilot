@@ -1,3 +1,12 @@
+# Update 21.11.2018
+
+I decided to stop the development on this project. I will create a new version of the autopilot which will be much easier to use. Therefore, I will create a new project from scratch to improve the design. This will take some time, as I've been a bit busy lately. Please stay tuned.
+
+Feel free to check out the project website for more information and development progress. I will also recreate it soon: https://www.ets2autopilot.com/
+
+
+# Archive
+
 This autpilot is based on the project by Sully Chen: https://github.com/SullyChen/Autopilot-TensorFlow
 
 ### Get started
